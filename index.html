@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coded By RommyXploit | Cyber Error System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+    /* 1. VARIABLE SISTEM (Pusat Warna) */
+    :root {
+        --bg: #ffffff;
+        --text: #000000;
+        --border: #000000;
+        --invert: 0; /* 0 = Normal */
+        --accent: #efefef;
+    }
+
+    /* Warna saat Mode Gelap Aktif */
+    [data-theme="dark"] {
+        --bg: #000000;
+        --text: #ffffff;
+        --border: #ffffff;
+        --invert: 1; /* 1 = Warna terbalik otomatis */
+        --accent: #1a1a1a;
+    }
+
+    /* 2. BASE STYLE */
+    * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+    
+    body { 
+        background-color: var(--bg);  
+        font-family: 'Poppins', sans-serif; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: 100vh; 
+        color: var(--text); 
+        overflow: hidden; 
+        padding: 20px; 
+    }
+
+    .container { text-align: center; max-width: 600px; width: 100%; }
+    .header-gif { width: 180px; height: auto; margin-bottom: 25px; }
+    
+    h1.header { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1rem; margin-bottom: 25px; text-transform: uppercase; color: var(--text); }
+    .quote { font-weight: 300; font-size: 0.8rem; font-style: italic; margin-bottom: 30px; display: block; opacity: 0.8; }
+    
+    .greet-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    
+    /* 3. BUTTONS & UI */
+    .btn-action { 
+        background: none; 
+        border: 1px solid var(--border); 
+        padding: 6px 14px; 
+        font-family: 'JetBrains Mono', monospace; 
+        font-size: 0.65rem; 
+        cursor: pointer; 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px; 
+        text-transform: uppercase; 
+        color: var(--text); 
+        font-weight: bold; 
+    }
+    
+    .btn-action:hover { background: var(--text); color: var(--bg); }
+
+    .marquee-wrapper { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin-bottom: 30px; overflow: hidden; border-y: 1px solid var(--border); padding: 5px 0; }
+    .marquee-container { width: 300px; overflow: hidden; white-space: nowrap; position: relative; margin: 0 auto; }
+    .marquee-text { display: inline-block; padding-left: 20px; animation: marquee 15s linear infinite; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+    .email { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--text); margin-top: 20px; display: inline-block; }
+
+    /* 4. MODALS & CANVAS (PENTING!) */
+    .modal { 
+        display: none; 
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        background: var(--bg); 
+        border: 2px solid var(--border); 
+        padding: 20px; 
+        z-index: 1000; 
+        box-shadow: 10px 10px 0px var(--border); 
+        width: 320px; 
+        max-height: 90vh; 
+        overflow-y: auto; 
+    }
+
+    .modal-header { display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
+    canvas { 
+        border: 1px solid var(--border); 
+        background: #ffffff; /* Tetap putih agar filter invert bekerja sempurna */
+        width: 100%; 
+        display: block; 
+        margin: 0 auto; 
+        filter: invert(var(--invert)); /* INI KUNCINYA: Karakter game berubah warna otomatis */
+    }
+
+    .reset-btn { width: 100%; border: 1px solid var(--border); background: none; color: var(--text); font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer; padding: 8px; margin-top: 10px; font-weight: bold; }
+    .reset-btn:hover { background: var(--text); color: var(--bg); }
+
+    /* 5. GAMES SPECIFIC */
+    .grid-2048 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; background: var(--border); padding: 5px; }
+    .cell-2048 { aspect-ratio: 1/1; background: var(--bg); display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono'; font-weight: bold; color: var(--text); }
+    
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .memory-card { aspect-ratio: 1/1; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; cursor: pointer; background: var(--text); color: var(--bg); }
+    .memory-card.flipped, .memory-card.matched { background: var(--bg); color: var(--text); }
+    
+    .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .cell { aspect-ratio: 1/1; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; cursor: pointer; font-family: 'JetBrains Mono'; font-weight: bold; color: var(--text); }
+    
+    #sudokuContainer { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: var(--border); border: 2px solid var(--border); width: 100%; }
+    .sudoku-cell { aspect-ratio: 1/1; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono'; font-size: 0.8rem; cursor: pointer; }
+    .sudoku-cell.fixed { background: var(--accent); opacity: 0.7; }
+    
+    /* Container Info Level */
+.level-info {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* Indikator DOT yang diperbesar */
+.dot-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.dot {
+    width: 14px; /* Ukuran diperbesar */
+    height: 14px; /* Ukuran diperbesar */
+    border-radius: 50%;
+    background: rgba(128, 128, 128, 0.2); /* Abu-abu redup saat mati */
+    transition: all 0.2s ease;
+}
+
+/* Warna menyala saat aktif (Tetap berwarna agar mudah dibedakan) */
+#dot0.active { background: #FF3D00 !important; box-shadow: 0 0 15px #FF3D00; } 
+#dot1.active { background: #00E676 !important; box-shadow: 0 0 15px #00E676; } 
+#dot2.active { background: #2979FF !important; box-shadow: 0 0 15px #2979FF; } 
+#dot3.active { background: #FFEA00 !important; box-shadow: 0 0 15px #FFEA00; }
+
+
+/* Container khusus Minesweeper */
+.mine-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+    gap: 8px;
+    margin: 20px auto;
+    max-width: 280px;
+}
+
+.mine-cell {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+}
+
+/* Saat kotak dibuka */
+.mine-cell.open {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+}
+
+/* Saat kena bomb */
+.mine-cell.bomb {
+    background: #FF3D00 !important;
+    color: white !important;
+    border-color: #FF3D00 !important;
+}
+
+
+</style>
+<style>
+    .mine-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin: 15px auto;
+        max-width: 250px;
+    }
+    .mine-cell {
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        transition: 0.2s;
+        color: var(--text);
+    }
+    .mine-cell.open {
+        background: var(--text) !important;
+        color: var(--bg) !important;
+        border-color: var(--text) !important;
+    }
+    .mine-cell.bomb {
+        background: #ff3d00 !important;
+        color: white !important;
+        border-color: #ff3d00 !important;
+    }
+    
+    .burst-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 15px auto;
+    max-width: 250px;
+}
+.burst-cell {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 50%; /* Bulat biar beda dengan Minesweeper */
+    font-size: 1.4rem;
+    color: var(--text);
+    transition: 0.2s;
+}
+.burst-cell.correct {
+    background: var(--text) !important;
+    color: var(--bg) !important;
+    transform: scale(0.8);
+    opacity: 0.3;
+}
+
+.dam-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Ukuran 5x5 agar tidak terlalu lama */
+    gap: 2px;
+    margin: 15px auto;
+    max-width: 250px;
+    background: var(--border);
+    border: 2px solid var(--border);
+}
+.dam-cell {
+    width: 100%;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.dam-cell.dark { background: var(--bg); }
+.dam-cell.light { background: #1a1a1a; } /* Warna sedikit lebih terang dari bg */
+
+/* Bidak (Pion) */
+.piece {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+.piece.player1 { 
+    background: #fff; /* Bidak Putih */
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.piece.player2 { 
+    background: #444; /* Bidak Hitam/Gelap */
+    border: 1px solid #fff;
+}
+.selected {
+    outline: 2px solid var(--text);
+    transform: scale(1.1);
+}
+
+/* Container Game Stacker */
+#stackCanvas {
+    background: #000;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #333;
+    cursor: pointer;
+    max-width: 100%;
+}
+
+.stack-info {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    color: #fff;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+#stackBtn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+#stackBtn:hover {
+    background: #ccc;
+}
+.chat-container {
+    background: #000;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #333;
+}
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.msg { max-width: 85%; padding: 10px 14px; border-radius: 8px; line-height: 1.5; }
+.msg.ai { background: #1a1a1a; color: #fff; align-self: flex-start; border: 1px solid #333; }
+.msg.user { background: #fff; color: #000; align-self: flex-end; font-weight: bold; }
+.chat-input-area { border-top: 1px solid #333; padding: 10px; background: #000; }
+.chat-input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-family: inherit; }
+/* --- CSS FINAL CYBER CHESS (PRESISI & RESPONSIF) --- */
+#ch_board {
+    aspect-ratio: 1 / 1;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    overflow: hidden;
+}
+
+/* Kunci agar bidak di tengah */
+#ch_board div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+}
+
+#ch_board i {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.6rem; /* Ukuran bidak pas */
+    line-height: 0 !important;
+    pointer-events: none;
+}
+
+.ch-hint {
+    width: 10px;
+    height: 10px;
+    background: rgba(0, 255, 0, 0.6);
+    border-radius: 50%;
+    position: absolute;
+    z-index: 5;
+}
+
+/* Style tambahan untuk modal agar muncul di paling depan */
+#chessModal {
+    z-index: 9999 !important;
+}
+/* --- CSS CYBER LANDSCAPE --- */
+#landscapeModal {
+    z-index: 9999 !important; /* Pastikan modal ini selalu di depan */
+    width: 320px; /* Ukuran modal yang sama */
+}
+
+#landscapeCanvas {
+    background: #000; /* Latar belakang hitam pekat */
+    border: 1px solid var(--border);
+    display: block;
+    margin: 10px auto;
+    filter: invert(var(--invert)); /* Tetap hitam putih sesuai tema */
+}
+
+.landscape-control {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+.landscape-control button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text);
+    font-family: 'jetbrains mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+.landscape-control button:hover {
+    background: var(--text);
+    color: var(--bg);
+}
+/* --- CSS CYBER_SIM v10.0 FINAL --- */
+#landscapeView {
+    width: 280px;
+    height: 180px;
+    background: #000;
+    margin: 0 auto 15px auto;
+    border: 2px solid #000;
+    position: relative;
+    overflow: hidden;
+    transition: background 1.5s ease;
+    /* Memastikan teks di dalam layar tidak mempengaruhi luar */
+    color: #fff; 
+}
+
+.ground-line {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    z-index: 5;
+}
+
+.ls-icon {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.mirror { transform: scaleX(-1); }
+
+/* Gelembung Komentar Karakter */
+.ls-bubble {
+    background: #fff;
+    color: #000;
+    font-size: 8px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    opacity: 0; /* Sembunyi secara default */
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    border: 1px solid #000;
+}
+
+.rain {
+    position: absolute;
+    background: currentColor;
+    width: 1px;
+    height: 6px;
+    opacity: 0.4;
+    z-index: 4;
+}
+
+</style>
+
+<div id="mineModal" class="modal" style="display: none;">
+    <div class="modal-header">
+        <span>MINESWEEPER REBOOT</span>
+        <span style="cursor:pointer" onclick="document.getElementById('mineModal').style.display='none'">[Exit]</span>
+    </div>
+    <div id="statusMine" style="text-align:center; margin:10px 0; font-size:0.8rem; color:var(--text);">
+        SCANNING SAFE PATH...
+    </div>
+    <div id="mineGrid" class="mine-grid"></div>
+    <button class="reset-btn" style="width:100%" onclick="initMine()">NEW SCAN</button>
+</div>
+<div id="landscapeModal" class="modal" style="display:none; z-index: 10001;">
+    <div class="modal-header" style="background:#fff; color:#000; border-bottom:2px solid #000;">
+        <span><i class="fas fa-cat"></i> Animal Live</span>
+        <span onclick="closeLandscape()" style="cursor:pointer; padding: 0 10px;">[X]</span>
+    </div>
+    
+    <div style="text-align:center; padding:15px 0; background:#fff;">
+        <div id="landscapeView">
+            <div class="ground-line"></div>
+        </div>
+        
+        <div style="display:flex; gap:10px; justify-content:center; padding:0 15px;">
+            <button onclick="CyberSim.reset()" class="reset-btn" style="flex:1; background:#000; color:#fff; border:none; padding:8px;">RESTART</button>
+            <button onclick="closeLandscape()" class="reset-btn" style="flex:1; background:#fff; color:#000; border:2px solid #000; padding:8px;">EXIT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let bombs = [];
+    let gameOver = false;
+
+    // Fungsi buka modal yang anti-gagal
+    function openMinesweeper() {
+        // Sembunyikan modal lain jika ada
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        
+        // Munculkan modal mine
+        const modal = document.getElementById('mineModal');
+        modal.style.display = 'block';
+        
+        // Jalankan game
+        initMine();
+    }
+
+    function initMine() {
+        gameOver = false;
+        bombs = [];
+        document.getElementById('statusMine').innerText = "SCANNING SAFE PATH...";
+        const container = document.getElementById('mineGrid');
+        container.innerHTML = ''; 
+
+        // Pasang 4 bomb acak
+        while(bombs.length < 4) {
+            let r = Math.floor(Math.random() * 25);
+            if(!bombs.includes(r)) bombs.push(r);
+        }
+
+        // Gambar kotak
+        for(let i = 0; i < 25; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'mine-cell';
+            cell.onclick = function() {
+                if(gameOver) return;
+                if(this.classList.contains('open')) return;
+
+                if(bombs.includes(i)) {
+                    gameOver = true;
+                    this.classList.add('bomb');
+                    this.innerHTML = '<i class="fas fa-skull"></i>';
+                    // Tampilkan semua bomb
+                    bombs.forEach(b => {
+                        const allCells = document.querySelectorAll('.mine-cell');
+                        allCells[b].classList.add('bomb');
+                        allCells[b].innerHTML = '<i class="fas fa-bomb"></i>';
+                    });
+                    document.getElementById('statusMine').innerText = "CRITICAL: BOOM!";
+                } else {
+                    this.classList.add('open');
+                    let count = 0;
+                    // Cek sekitar
+                    let row = Math.floor(i / 5);
+                    let col = i % 5;
+                    for(let x=-1; x<=1; x++) {
+                        for(let y=-1; y<=1; y++) {
+                            let r = row+x, c = col+y;
+                            if(r>=0 && r<5 && c>=0 && c<5 && bombs.includes(r*5+c)) count++;
+                        }
+                    }
+                    this.innerText = count > 0 ? count : '';
+                    
+                    // Cek Menang
+                    if(document.querySelectorAll('.mine-cell.open').length === 21) {
+                        gameOver = true;
+                        document.getElementById('statusMine').innerText = "PATH CLEAR: EXCELLENT!";
+                    }
+                }
+            };
+            container.appendChild(cell);
+        }
+    }
+</script>
+
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://media1.tenor.com/m/n-i-XptlsdMAAAAd/cute-bunny.gif" alt="RommyXploit" class="header-gif">
+        <h1 class="header">&lt;/&gt; Coded By <span style="color: #666;">./</span><span id="scramble-text">RommyXploit </span> &lt;/&gt;</h1>
+        <span class="quote">"We are just a shadow in the digital crowd."</span>
+        
+        <div class="greet-row">
+            <audio id="myAudio" loop><source src="https://d.top4top.io/m_3703mige90.mp3" type="audio/mpeg"></audio>
+            <button class="btn-action" onclick="togglePlay()"><i id="musicIcon" class="fas fa-play"></i> MUSIC</button>
+            <button class="btn-action" onclick="toggleModal('menuModal')"><i class="fas fa-gamepad"></i> GAMES MENU</button>
+            <button class="btn-action" onclick="toggleTheme()"><i id="themeIcon" class="fas fa-moon"></i> MODE</button>
+             <button class="btn-action" onclick="openRanking()"><i class="fas fa-trophy"></i> RANKING</button>
+             
+        </div>
+        
+        <div class="marquee-wrapper"><div class="marquee-container"><div class="marquee-text">!Fakesite - Doys_404 - Anon_lx02 - Fakesec666 - Iethesia - SukaKamu01 - Qyuraa - Enter666x - NoFace999 - Lanzz - Xzuvuww - XybaXploite - RommyXploit - Vurex - Dandier - Xstroven - BigBoy - AgenMassive - KingArtur - IvanApolloyon - Amirxploite - Machfood - Rsyiddz - Fedup_404 - UniCorn - Izunasec - VinzXploit - HanJsXploit</div></div></div>
+        <a href="mailto:bapakluhecker23@proton.me" class="email">bapakluhecker23@proton.me</a>
+    </div>     
+    <div id="menuModal" class="modal">
+        <div class="modal-header"><span>SELECT GAME</span><span onclick="toggleModal('menuModal')" style="cursor:pointer">[Exit]</span></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn-action" onclick="openGame('gameModal')"><i class="fas fa-hashtag"></i> XOX</button>
+            <button class="btn-action" onclick="openGame('pongModal')"><i class="fas fa-table-tennis-paddle-ball"></i> PONG</button>
+            <button class="btn-action" onclick="openGame('dinoModal')"><i class="fas fa-ghost"></i> PAC-MAN RUN</button>
+            <button class="btn-action" onclick="openGame('birdModal')"><i class="fas fa-dove"></i> BIRD</button>
+            <button class="btn-action" onclick="openGame('snakeModal')"><i class="fas fa-staff-snake"></i> SNAKE</button>
+            <button class="btn-action" onclick="openGame('catchModal')"><i class="fas fa-hand-holding-heart"></i> CATCH</button>
+            <button class="btn-action" onclick="openGame('memoryModal')"><i class="fas fa-brain"></i> MEMORY</button>
+            <button class="btn-action" onclick="openGame('brickModal')"><i class="fas fa-th"></i> BRICKS</button>
+            <button class="btn-action" onclick="openGame('modal2048')"><i class="fas fa-cubes"></i> 2048</button>
+            <button class="btn-action"><i class="fas fa-ghost"></i> PAC-MAN</button>
+            <button class="btn-action"><i class="fas fa-table"></i> SUDOKU</button>
+            <button class="btn-action" onclick="toggleModal('simonModal')"><i class="fas fa-gamepad"></i> NEON PATTERN</button>
+            <button class="btn-action" onclick="openMinesweeper()"><i class="fas fa-bomb"></i> MINESWEEPER</button>
+            <button class="btn-action" onclick="openBurst()"><i class="fas fa-bolt"></i> DIGIT BURST</button>
+            <button class="btn-action" onclick="openDam()">
+    <i class="fas fa-chess-board"></i> STRATEGY DAM
+</button>
+<button class="btn-action" onclick="openStackGame()">
+    <i class="fas fa-layer-group"></i> TOWER STACK
+</button><button class="btn-action" onclick="openDecryptor()">
+    <i class="fas fa-code"></i> DECRYPTOR
+</button>
+<button class="btn-action" onclick="openStoryGame()">
+    <i class="fas fa-ghost"></i> MYSTERY CHAT
+</button>
+<button class="btn-action" onclick="openMathGame()">
+    <i class="fas fa-calculator"></i> MATH BREAKER
+</button>
+<button class="btn-action" onclick="openCheckers()">
+    <i class="fas fa-chess-board"></i> CHECKERS
+</button>
+<button class="btn-action" onclick="openChess()">
+    <i class="fas fa-chess"></i> CHESS
+</button>
+
+<button class="btn-action" onclick="openLandscape()">
+    <i class="fas fa-cat"></i> ANIMAL LIVE
+</button>
+<div class="modal" id="rankModal" style="display:none">
+    <div class="modal-header">
+        <span><i class="fas fa-crown"></i> TOP_20_PLAYERS</span>
+        <span style="cursor:pointer;padding:5px" onclick="document.getElementById('rankModal').style.display='none'">[X]</span>
+    </div>
+    <div style="padding:15px">
+        <table style="width:100%; border-collapse: collapse; font-family:'JetBrains Mono'; font-size: 0.8rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--text); opacity: 0.7">
+                    <th style="padding:8px">#</th>
+                    <th style="text-align:left">PLAYER</th>
+                    <th style="text-align:right">SNAKE</th>
+                    <th style="text-align:right">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody id="rankBody"></tbody>
+        </table>
+    </div>
+</div>
+
+
+        </div>
+    </div>
+
+    <div id="modal2048" class="modal"><div class="modal-header"><span>CYBER 2048</span><span onclick="toggleModal('modal2048')" style="cursor:pointer">[Exit]</span></div><div id="grid2048" class="grid-2048"></div><button class="reset-btn" onclick="init2048()">NEW GAME</button><p style="font-size:0.6rem; margin-top:10px; font-family:'JetBrains Mono'">Swipe or Use Arrows to Move</p></div>
+    <div id="brickModal" class="modal"><div class="modal-header"><span>BRICKS</span><span onclick="stopAllGames(); toggleModal('brickModal')" style="cursor:pointer">[Exit]</span></div><canvas id="brickCanvas" width="280" height="250"></canvas><button id="startBrickBtn" class="reset-btn" onclick="startBrick()">START</button></div>
+    <div id="pongModal" class="modal"><div class="modal-header"><span>PONG vs AI</span><span onclick="stopAllGames(); toggleModal('pongModal')" style="cursor:pointer">[Exit]</span></div><canvas id="pongCanvas" width="280" height="250"></canvas><button id="startPongBtn" class="reset-btn" onclick="startPong()">START</button></div>
+    <div id="snakeModal" class="modal"><div class="modal-header"><span>SNAKE</span><span onclick="stopAllGames(); toggleModal('snakeModal')" style="cursor:pointer">[Exit]</span></div><canvas id="snakeCanvas" width="280" height="180"></canvas><div class="snake-ctrl"><div></div><button class="btn-action" onclick="changeSnakeDir(0,-1)"><i class="fas fa-chevron-up"></i></button><div></div><button class="btn-action" onclick="changeSnakeDir(-1,0)"><i class="fas fa-chevron-left"></i></button><button class="btn-action" id="startSnakeBtn" onclick="startSnake()"><i class="fas fa-play"></i></button><button class="btn-action" onclick="changeSnakeDir(1,0)"><i class="fas fa-chevron-right"></i></button><div></div><button class="btn-action" onclick="changeSnakeDir(0,1)"><i class="fas fa-chevron-down"></i></button><div></div></div></div>
+    <div id="catchModal" class="modal"><div class="modal-header"><span>CATCH BUG</span><span onclick="stopAllGames(); toggleModal('catchModal')" style="cursor:pointer">[Exit]</span></div><canvas id="catchCanvas" width="280" height="250"></canvas><button id="startCatchBtn" class="reset-btn" onclick="startCatch()">START</button></div>
+    <div id="memoryModal" class="modal"><div class="modal-header"><span>MEMORY</span><span onclick="stopAllGames(); toggleModal('memoryModal')" style="cursor:pointer">[Exit]</span></div><div id="memoryGrid" class="memory-grid"></div><button class="reset-btn" onclick="initMemory()">RESET</button></div>
+    <div id="gameModal" class="modal"><div class="modal-header"><span>XOX</span><span onclick="toggleModal('gameModal')" style="cursor:pointer">[Exit]</span></div><div class="game-grid"><div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div><div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div><div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div></div><button class="reset-btn" onclick="resetGame()">RESET</button></div>
+    <div id="dinoModal" class="modal">
+    <div class="modal-header">
+        <span>PAC-JUMP SYSTEM</span>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <i class="fas fa-cog" style="cursor:pointer; font-size: 0.9rem;" onclick="toggleCharMenu()"></i>
+            <span style="cursor:pointer" onclick="toggleModal('dinoModal')">[Exit]</span>
+        </div>
+    </div>
+    
+    
+    <div id="charOverlay" style="display:none; position:absolute; top:50px; left:20px; right:20px; background:var(--bg); border:2px solid var(--border); padding:15px; z-index:1001; box-shadow:8px 8px 0px var(--border);">
+        <p style="font-size:0.65rem; margin-bottom:12px; font-family:'JetBrains Mono'; font-weight:bold; text-transform:uppercase;">Select Agent:</p>
+        
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+            <button class="btn-action" style="padding:15px 0; justify-content:center;" onclick="setChar('\uf1e7')" title="Pac-Man">
+                <i class="fas fa-ghost"></i>
+            </button>
+            <button class="btn-action" style="padding:15px 0; justify-content:center;" onclick="setChar('\uf6e2')" title="Ghost">
+                <i class="fas fa-snapchat-ghost"></i>
+            </button>
+            <button class="btn-action" style="padding:15px 0; justify-content:center;" onclick="setChar('\uf54c')" title="Skull">
+                <i class="fas fa-skull"></i>
+            </button>
+            <button class="btn-action" style="padding:15px 0; justify-content:center;" onclick="setChar('\uf21b')" title="Hacker">
+                <i class="fas fa-user-secret"></i>
+            </button>
+        </div>
+        
+        <button class="reset-btn" style="margin-top:15px; width:100%;" onclick="toggleCharMenu()">CONFIRM</button>
+    </div>
+
+    <canvas id="dinoCanvas" width="280" height="150"></canvas>
+    <button id="startDinoBtn" class="reset-btn" onclick="startDino()">INITIALIZE START</button>
+</div>
+
+    <div id="birdModal" class="modal"><div class="modal-header"><span>BIRD</span><span onclick="stopAllGames(); toggleModal('birdModal')" style="cursor:pointer">[Exit]</span></div><canvas id="birdCanvas" width="280" height="300"></canvas><button id="startBirdBtn" class="reset-btn" onclick="startBird()">START</button></div>
+
+    <div id="pacmanModal" class="modal">
+        <div class="modal-header"><span>CYBER PAC-MAN</span><span onclick="stopAllGames(); toggleModal('pacmanModal')" style="cursor:pointer">[Exit]</span></div>
+        <canvas id="pacmanCanvas" width="280" height="250"></canvas>
+        <button id="startPacmanBtn" class="reset-btn" onclick="startPacman()">START GAME</button>
+    </div>
+
+    <div id="sudokuModal" class="modal">
+        <div class="modal-header"><span>CYBER SUDOKU</span><span onclick="stopAllGames(); toggleModal('sudokuModal')" style="cursor:pointer">[Exit]</span></div>
+        <div id="sudokuContainer"></div>
+        <div id="sudokuKeypad"></div>
+        <button class="reset-btn" onclick="initSudoku()">RESET PUZZLE</button>
+    </div>
+<div id="simonModal" class="modal">
+    <div class="modal-header">
+        <span>NEON PATTERN</span>
+        <span style="cursor:pointer" onclick="toggleModal('simonModal')">[Exit]</span>
+    </div>
+    
+    <div class="level-info">STAGE <span id="currentLevel">1</span></div>
+    
+    <div id="statusSimon" style="font-family: 'Poppins', sans-serif; font-size:0.7rem; margin-bottom:15px; color:var(--text); text-align:center; min-height:20px; opacity:0.8;">
+        READY TO START?
+    </div>
+    
+    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-bottom:20px;">
+        <div id="sim0" class="btn-action" style="flex-direction:column; height:100px; background:var(--bg); color:var(--text); border:2px solid var(--border);" onclick="userClick(0)">
+            <i class="fas fa-ghost" style="font-size:1.8rem;"></i>
+            <div class="dot-container"><div id="dot0" class="dot"></div></div>
+        </div>
+        <div id="sim1" class="btn-action" style="flex-direction:column; height:100px; background:var(--bg); color:var(--text); border:2px solid var(--border);" onclick="userClick(1)">
+            <i class="fas fa-skull" style="font-size:1.8rem;"></i>
+            <div class="dot-container"><div id="dot1" class="dot"></div></div>
+        </div>
+        <div id="sim2" class="btn-action" style="flex-direction:column; height:100px; background:var(--bg); color:var(--text); border:2px solid var(--border);" onclick="userClick(2)">
+            <i class="fas fa-robot" style="font-size:1.8rem;"></i>
+            <div class="dot-container"><div id="dot2" class="dot"></div></div>
+        </div>
+        <div id="sim3" class="btn-action" style="flex-direction:column; height:100px; background:var(--bg); color:var(--text); border:2px solid var(--border);" onclick="userClick(3)">
+            <i class="fas fa-bolt" style="font-size:1.8rem;"></i>
+            <div class="dot-container"><div id="dot3" class="dot"></div></div>
+        </div>
+    </div>
+
+    <button id="startSimonBtn" class="reset-btn" style="width:100%;" onclick="startSimon()">START GAME</button>
+</div>
+<div id="burstModal" class="modal" style="display: none;">
+    <div class="modal-header">
+        <span>DIGIT BURST</span>
+        <span style="cursor:pointer" onclick="document.getElementById('burstModal').style.display='none'">[Exit]</span>
+    </div>
+    <div style="text-align:center; margin:10px 0;">
+        <span id="burstTimer" style="font-size: 1.5rem; font-weight: bold;">0.00s</span>
+    </div>
+    <div id="burstGrid" class="burst-grid"></div>
+    <button class="reset-btn" style="width:100%" onclick="startBurst()">START NEW ROUND</button>
+</div>
+<div id="damModal" class="modal" style="display: none;">
+    <div class="modal-header">
+        <span>STRATEGY: DAM</span>
+        <span style="cursor:pointer" onclick="document.getElementById('damModal').style.display='none'">[Exit]</span>
+    </div>
+    <div id="statusDam" style="text-align:center; margin:10px 0; font-size:0.8rem; color:var(--text); font-weight:bold;">
+        PLAYER 1 TURN (WHITE)
+    </div>
+    <div id="damGrid" class="dam-grid"></div>
+    <button class="reset-btn" style="width:100%" onclick="initDam()">RESET BOARD</button>
+</div>
+<div id="decryptorModal" class="modal">
+    <div class="modal-header">
+        <span>DECRYPTOR SYSTEM</span>
+        <span onclick="toggleModal('decryptorModal')" style="cursor:pointer">[Exit]</span>
+    </div>
+    
+    <div style="text-align:center; padding:10px 0;">
+        <div id="dec_scrambledBox" style="font-family:'JetBrains Mono'; font-size: 1.4rem; font-weight:bold; letter-spacing:4px; background:var(--text); color:var(--bg); padding:12px; margin-bottom:15px; text-transform:uppercase; border:1px solid var(--border);">XXXXX</div>
+        
+        <input type="text" id="dec_userInput" placeholder="ENTER CODE..." style="width:100%; padding:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none; text-align:center; font-family:'JetBrains Mono'; font-size:0.8rem; margin-bottom:10px;" autocomplete="off">
+        
+        <div id="dec_statusMsg" style="font-family:'JetBrains Mono'; font-size:0.6rem; font-weight:bold; margin-bottom:15px; text-transform:uppercase; min-height:12px; color:var(--text);">READY TO SCAN...</div>
+        
+        <button onclick="processDecryption()" class="reset-btn" style="margin-top:0; width:100%;">EXECUTE DECRYPT</button>
+    </div>
+</div>
+<div id="storyModal" class="modal" style="display:none;">
+    <div class="modal-header">
+        <span><i class="fas fa-terminal"></i> MYSTERY_LOG v1.2</span>
+        <span id="st_lifeDisplay" style="color:#ff3d00; font-weight:bold;"><i class="fas fa-heart"></i> 3</span>
+        <span onclick="closeStoryGame()" style="cursor:pointer; margin-left:10px;">[Exit]</span>
+    </div>
+    
+    <div id="storyBox" style="background:var(--bg); color:var(--text); height:320px; overflow-y:auto; padding:15px; font-family:'JetBrains Mono', monospace; font-size:0.75rem; border:1px solid var(--border); display:flex; flex-direction:column; gap:12px; margin-bottom:10px; line-height:1.5; white-space: pre-wrap; word-wrap: break-word;">
+    </div>
+
+    <div id="storyInputArea" style="display:none;">
+        <div style="display:flex; gap:5px; flex-direction:column;">
+            <input type="text" id="storyUserInp" placeholder="TYPE RESPONSE..." style="width:100%; padding:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); outline:none; font-family:'JetBrains Mono'; font-size:0.75rem; text-transform:uppercase;">
+            <button onclick="handleStoryInput()" class="reset-btn" style="margin-top:5px; width:100%;">
+                <i class="fas fa-paper-plane"></i> SEND SIGNAL
+            </button>
+        </div>
+    </div>
+</div>
+<div id="mathModal" class="modal" style="display:none;">
+    <div class="modal-header">
+        <span><i class="fas fa-microchip"></i> MATH_BREAKER v1.0</span>
+        <span onclick="closeMathGame()" style="cursor:pointer">[Exit]</span>
+    </div>
+    
+    <div style="text-align:center; padding:10px 0;">
+        <div style="display:flex; justify-content:space-around; font-family:'JetBrains Mono'; font-size:0.7rem; margin-bottom:15px; border-bottom:1px dashed var(--border); padding-bottom:10px;">
+            <span style="color:green;">CORRECT: <span id="math_correct">0</span></span>
+            <span style="color:red;">WRONG: <span id="math_wrong">0</span></span>
+        </div>
+
+        <div id="math_question" style="font-size: 2rem; font-weight:bold; margin:20px 0; font-family:'JetBrains Mono';">0 + 0</div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button id="math_btn1" onclick="checkMathAnswer(this)" class="reset-btn" style="font-size:1.2rem; padding:15px 0;">0</button>
+            <button id="math_btn2" onclick="checkMathAnswer(this)" class="reset-btn" style="font-size:1.2rem; padding:15px 0;">0</button>
+        </div>
+
+        <div id="math_feedback" style="margin-top:15px; font-size:0.6rem; font-weight:bold; height:12px; text-transform:uppercase;">READY?</div>
+    </div>
+</div>
+<div id="checkersModal" class="modal" style="display:none;">
+    <div class="modal-header">
+        <span><i class="fas fa-chess-board"></i> CHECKERS </span>
+        <span onclick="closeCheckers()" style="cursor:pointer">[Exit]</span>
+    </div>
+    
+    <div style="text-align:center; padding:10px 0;">
+        <div id="ck_status" style="font-family:'JetBrains Mono'; font-size:0.7rem; margin-bottom:10px; text-transform:uppercase;">YOUR TURN (BLUE)</div>
+        
+        <div id="ck_board" style="display:grid; grid-template-columns: repeat(8, 1fr); width:280px; height:280px; margin:0 auto; border:2px solid var(--border); background:var(--border); gap:1px;">
+            </div>
+
+        <button onclick="initCheckers()" class="reset-btn" style="margin-top:15px; width:100%;">RESET GAME</button>
+    </div>
+</div>
+
+
+
+
+    <script>
+    
+                function toggleModal(id) { const m = document.getElementById(id); m.style.display = (m.style.display === 'block') ? 'none' : 'block'; }
+        function openGame(id) { stopAllGames(); toggleModal('menuModal'); toggleModal(id); if(id==='pongModal') initPong(); if(id==='snakeModal') initSnake(); if(id==='brickModal') initBrick(); if(id==='modal2048') init2048(); if(id==='memoryModal') initMemory(); if(id==='catchModal') initCatch(); if(id==='dinoModal') initDino(); if(id==='birdModal') initBird(); }
+        
+        function stopAllGames() { 
+            // Reset status semua game ke false sesuai script asli kamu
+            pongRunning=snakeRunning=catchRunning=brickRunning=dinoRunning=birdRunning=false; 
+            if(typeof pacRunning !== 'undefined') pacRunning = false;
+            try {
+                clearTimeout(snakeTimeout); 
+                cancelAnimationFrame(pongReq); 
+                cancelAnimationFrame(catchReq); 
+                cancelAnimationFrame(brickReq); 
+                cancelAnimationFrame(dinoReq); 
+                cancelAnimationFrame(birdReq);
+                if(typeof pacReq !== 'undefined') cancelAnimationFrame(pacReq);
+            } catch(e) {}
+        }
+
+        var audio = document.getElementById("myAudio");
+        function togglePlay() { const icon = document.getElementById("musicIcon"); if (audio.paused) { audio.play(); icon.className="fas fa-pause"; } else { audio.pause(); icon.className="fas fa-play"; } }
+
+        // --- 2048 LOGIC ---
+        let board2048 = [];
+        function init2048() { board2048 = Array(16).fill(0); addTile(); addTile(); render2048(); }
+        function addTile() { let empty = board2048.map((v,i)=>v===0?i:null).filter(v=>v!==null); if(empty.length) board2048[empty[Math.floor(Math.random()*empty.length)]] = Math.random()<0.9?2:4; }
+        function render2048() { const g = document.getElementById("grid2048"); g.innerHTML = ""; board2048.forEach(v=>{ let c=document.createElement("div"); c.className="cell-2048"; c.innerText=v||""; if(v>=1024) c.style.fontSize="0.7rem"; g.appendChild(c); }); }
+        
+        function move2048(dir) {
+            let moved = false;
+            const getRow = (i) => [board2048[i*4], board2048[i*4+1], board2048[i*4+2], board2048[i*4+3]];
+            const getCol = (i) => [board2048[i], board2048[i+4], board2048[i+8], board2048[i+12]];
+            const setRow = (i, row) => { for(let j=0; j<4; j++) { if(board2048[i*4+j]!==row[j]) moved=true; board2048[i*4+j]=row[j]; } };
+            const setCol = (i, col) => { for(let j=0; j<4; j++) { if(board2048[i+j*4]!==col[j]) moved=true; board2048[i+j*4]=col[j]; } };
+            const slide = (arr) => {
+                let filtered = arr.filter(v => v !== 0);
+                for(let i=0; i<filtered.length-1; i++) { if(filtered[i]===filtered[i+1]) { filtered[i]*=2; filtered.splice(i+1, 1); moved=true; } }
+                while(filtered.length<4) filtered.push(0); return filtered;
+            };
+            if(dir==='left') for(let i=0; i<4; i++) setRow(i, slide(getRow(i)));
+            if(dir==='right') for(let i=0; i<4; i++) setRow(i, slide(getRow(i).reverse()).reverse());
+            if(dir==='up') for(let i=0; i<4; i++) setCol(i, slide(getCol(i)));
+            if(dir==='down') for(let i=0; i<4; i++) setCol(i, slide(getCol(i).reverse()).reverse());
+            if(moved) { addTile(); render2048(); if(!board2048.includes(0)) alert("GAME OVER!"); }
+        }
+
+        // --- BRICK BREAKER (STABIL) ---
+        const brCanvas = document.getElementById("brickCanvas"); const brCtx = brCanvas.getContext("2d");
+        let brickReq, brickRunning = false, ballB = {x:140, y:200, dx:2.5, dy:-2.5}, padB = {x:110, w:60};
+        let bricks = []; const rowCount = 5, colCount = 8;
+        brCanvas.addEventListener("mousemove", (e) => { let r=brCanvas.getBoundingClientRect(); padB.x = (e.clientX-r.left)-padB.w/2; });
+        brCanvas.addEventListener("touchmove", (e) => { let r=brCanvas.getBoundingClientRect(); padB.x = (e.touches[0].clientX-r.left)-padB.w/2; e.preventDefault(); }, {passive:false});
+        function initBrick() { brickRunning=false; ballB={x:140, y:200, dx:2.5, dy:-2.5}; bricks=[]; for(let c=0; c<colCount; c++){ bricks[c]=[]; for(let r=0; r<rowCount; r++){ bricks[c][r]={x:0, y:0, s:1}; } } drawBr(); document.getElementById('startBrickBtn').style.display='block'; }
+        function startBrick() { brickRunning=true; document.getElementById('startBrickBtn').style.display='none'; animateBr(); }
+        function drawBr() { brCtx.clearRect(0,0,280,250); brCtx.fillStyle="#000"; brCtx.beginPath(); brCtx.arc(ballB.x, ballB.y, 4, 0, 7); brCtx.fill(); brCtx.fillRect(padB.x, 235, padB.w, 8); for(let c=0; c<colCount; c++){ for(let r=0; r<rowCount; r++){ if(bricks[c][r].s===1){ let bw=30, bh=10, gap=4; let bx=c*(bw+gap)+5, by=r*(bh+gap)+30; bricks[c][r].x=bx; bricks[c][r].y=by; brCtx.fillRect(bx, by, bw, bh); } } } }
+        function animateBr() { if(!brickRunning) return; ballB.x+=ballB.dx; ballB.y+=ballB.dy; if(ballB.x<0 || ballB.x>280) ballB.dx*=-1; if(ballB.y<0) ballB.dy*=-1; if(ballB.y>225 && ballB.x>padB.x && ballB.x<padB.x+padB.w) ballB.dy=-Math.abs(ballB.dy); for(let c=0; c<colCount; c++){ for(let r=0; r<rowCount; r++){ let b = bricks[c][r]; if(b.s===1 && ballB.x > b.x && ballB.x < b.x+30 && ballB.y > b.y && ballB.y < b.y+10){ ballB.dy*=-1; b.s=0; } } } if(ballB.y>250){ alert("OVER!"); initBrick(); return; } if(bricks.every(c=>c.every(r=>r.s===0))){ alert("WIN!"); initBrick(); return; } drawBr(); brickReq=requestAnimationFrame(animateBr); }
+
+        // --- PONG (AI) ---
+        const pCanvas = document.getElementById("pongCanvas"); const pCtx = pCanvas.getContext("2d");
+        let pongReq, pongRunning = false, ballP = {x:140, y:125, dx:2, dy:2}, padP = {x:110, w:60}, aiP = {x:110, w:60};
+        pCanvas.addEventListener("mousemove", (e) => { let r=pCanvas.getBoundingClientRect(); padP.x = (e.clientX-r.left)-padP.w/2; });
+        pCanvas.addEventListener("touchmove", (e) => { let r=pCanvas.getBoundingClientRect(); padP.x = (e.touches[0].clientX-r.left)-padP.w/2; e.preventDefault(); }, {passive:false});
+        function initPong() { pongRunning=false; ballP={x:140, y:125, dx:2, dy:2}; drawP(); document.getElementById('startPongBtn').style.display='block'; }
+        function startPong() { pongRunning=true; document.getElementById('startPongBtn').style.display='none'; animateP(); }
+        function drawP() { pCtx.clearRect(0,0,280,250); pCtx.fillStyle="#000"; pCtx.beginPath(); pCtx.arc(ballP.x, ballP.y, 6, 0, 7); pCtx.fill(); pCtx.fillRect(padP.x, 235, padP.w, 10); pCtx.fillRect(aiP.x, 5, aiP.w, 10); }
+        function animateP() { if(!pongRunning) return; ballP.x+=ballP.dx; ballP.y+=ballP.dy; if(ballP.x<0||ballP.x>280) ballP.dx*=-1; aiP.x += (ballP.x - (aiP.x+30))*0.12; if(ballP.y<=15 && ballP.x>aiP.x && ballP.x<aiP.x+aiP.w) ballP.dy=Math.abs(ballP.dy); if(ballP.y>=225 && ballP.x>padP.x && ballP.x<padP.x+padP.w) ballP.dy=-Math.abs(ballP.dy); if(ballP.y<0){alert("WIN!"); initPong(); return;} if(ballP.y>250){alert("AI WIN!"); initPong(); return;} drawP(); pongReq=requestAnimationFrame(animateP); }
+
+        // --- SNAKE ---
+        const sCanvas = document.getElementById("snakeCanvas"); const sCtx = sCanvas.getContext("2d");
+        let snake = [{x:10, y:8}], snakeDir = {x:0, y:0}, snakeRunning = false, snakeTimeout, sFood = {x:15,y:5};
+        function initSnake() { snakeRunning = false; snake = [{x:10, y:8}]; snakeDir = {x:0, y:0}; sFood = {x:Math.floor(Math.random()*27), y:Math.floor(Math.random()*17)}; drawS(); document.getElementById('startSnakeBtn').style.display='inline-flex'; }
+        function startSnake() { snakeRunning = true; snakeDir = {x:1, y:0}; document.getElementById('startSnakeBtn').style.display='none'; animateS(); }
+        function changeSnakeDir(x,y) { if(x!==-snakeDir.x || y!==-snakeDir.y) snakeDir={x,y}; }
+        function drawS() { sCtx.clearRect(0,0,280,180); sCtx.font="12px FontAwesome"; snake.forEach((p, i) => { sCtx.fillText(i === 0 ? "\uf6e2" : "\uf111", p.x*10, p.y*10 + 10); }); sCtx.fillText("\uf1b2", sFood.x*10, sFood.y*10 + 10); }
+        function animateS() { if(!snakeRunning) return; let h = {x:snake[0].x+snakeDir.x, y:snake[0].y+snakeDir.y}; if(h.x<0||h.x>=28||h.y<0||h.y>=18||snake.some(s=>s.x===h.x&&s.y===h.y)) { alert("OVER!"); initSnake(); return; } snake.unshift(h); if(h.x===sFood.x && h.y===sFood.y){ sFood={x:Math.floor(Math.random()*27), y:Math.floor(Math.random()*17)}; } else { snake.pop(); } drawS(); snakeTimeout = setTimeout(animateS, 100); }
+
+        // --- CATCH GAME ---
+        const cCanvas = document.getElementById("catchCanvas"); const cCtx = cCanvas.getContext("2d");
+        let catchReq, catchRunning = false, basketX = 110, items = [], score = 0;
+        function initCatch() { catchRunning = false; items = []; score = 0; drawC(); document.getElementById('startCatchBtn').style.display='block'; }
+        function startCatch() { catchRunning = true; document.getElementById('startCatchBtn').style.display='none'; animateC(); }
+        cCanvas.addEventListener("mousemove", (e)=>{ let r=cCanvas.getBoundingClientRect(); basketX=(e.clientX-r.left)-30; });
+        cCanvas.addEventListener("touchmove", (e)=>{ let r=cCanvas.getBoundingClientRect(); basketX=(e.touches[0].clientX-r.left)-30; e.preventDefault();}, {passive:false});
+        function drawC() { cCtx.clearRect(0,0,280,250); cCtx.font="20px FontAwesome"; cCtx.fillText("\uf3ed", basketX+20, 240); items.forEach(i=>cCtx.fillText("\uf188", i.x, i.y)); cCtx.font="12px JetBrains Mono"; cCtx.fillText("Score: "+score, 10, 20); }
+        function animateC() { if(!catchRunning) return; if(Math.random()<0.04) items.push({x:Math.random()*260, y:0}); items.forEach((i,idx)=>{ i.y+=3.5; if(i.y>220 && i.x>basketX && i.x<basketX+60) { items.splice(idx,1); score++; } else if(i.y>250) { alert("OVER!"); initCatch(); return; } }); drawC(); catchReq = requestAnimationFrame(animateC); }
+
+        // --- MEMORY ---
+        const icons_mem = ["fa-bug", "fa-code", "fa-terminal", "fa-microchip", "fa-shield-halved", "fa-user-secret", "fa-key", "fa-wifi"];
+        let flipped = [];
+        function initMemory() { const grid = document.getElementById("memoryGrid"); grid.innerHTML = ""; let deck = [...icons_mem, ...icons_mem].sort(()=>Math.random()-0.5); deck.forEach((icon, i) => { let card = document.createElement("div"); card.className = "memory-card"; card.dataset.icon = icon; card.onclick = () => { if(flipped.length<2 && !card.classList.contains("flipped")) { card.classList.add("flipped"); card.innerHTML = `<i class="fas ${icon}"></i>`; flipped.push(card); if(flipped.length === 2) { if(flipped[0].dataset.icon === flipped[1].dataset.icon) { flipped.forEach(c=>c.classList.add("matched")); flipped = []; } else { setTimeout(()=>{ flipped.forEach(c=>{c.classList.remove("flipped"); c.innerHTML=""}); flipped=[]; }, 600); } } } }; grid.appendChild(card); }); }
+
+        // --- DINO (Logic Asli) ---
+        const dCanvas = document.getElementById("dinoCanvas"); const dCtx = dCanvas.getContext("2d");
+        let dinoReq, dinoRunning=false, dY=148, dV=0, obsX=300;
+        function initDino(){dinoRunning=false; obsX=300; dY=148; drawD(); document.getElementById('startDinoBtn').style.display='block';}
+        function startDino(){dinoRunning=true; document.getElementById('startDinoBtn').style.display='none'; animateD();}
+        dCanvas.addEventListener("touchstart", (e)=>{if(dY>=148) dV=-8.5; e.preventDefault();}, {passive:false});
+        function drawD(){
+    dCtx.clearRect(0,0,280,150); 
+    dCtx.font="22px FontAwesome"; 
+    dCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text') || "#000";
+    
+    // GANTI "\uf21b" dengan variabel currentChar
+    dCtx.fillText(currentChar, 20, dY); 
+    
+    dCtx.fillRect(obsX, 130, 15, 20); 
+    dCtx.fillRect(0, 149, 280, 1);
+}
+
+
+        function animateD(){if(!dinoRunning) return; dV+=0.45; dY+=dV; if(dY>148){dY=148; dV=0;} obsX-=4.2; if(obsX<-20) obsX=300; if(obsX<40 && obsX>15 && dY>130){alert("OVER!"); initDino(); return;} drawD(); dinoReq=requestAnimationFrame(animateD);}
+
+        // --- BIRD (Logic Asli) ---
+        const bCanvas = document.getElementById("birdCanvas"); const bCtx = bCanvas.getContext("2d");
+        let birdReq, birdRunning=false, bY=150, bV=0, piX=280, gY=80;
+        function initBird(){birdRunning=false; bY=150; bV=0; piX=280; drawB(); document.getElementById('startBirdBtn').style.display='block';}
+        function startBird(){birdRunning=true; document.getElementById('startBirdBtn').style.display='none'; animateB();}
+        bCanvas.addEventListener("touchstart", (e)=>{bV=-4.5; e.preventDefault();}, {passive:false});
+        function drawB(){bCtx.clearRect(0,0,280,300); bCtx.font="22px FontAwesome"; bCtx.fillText("\uf4ba", 50, bY); bCtx.fillRect(piX, 0, 40, gY); bCtx.fillRect(piX, gY+110, 40, 300);}
+        function animateB(){if(!birdRunning) return; bV+=0.18; bY+=bV; piX-=2.5; if(piX<-40){piX=280; gY=Math.random()*130+40;} if(bY>300||bY<0){alert("OVER!"); initBird(); return;} if(piX<75 && piX+40>50){if(bY-18<gY || bY>gY+110){alert("OVER!"); initBird(); return;}} drawB(); birdReq=requestAnimationFrame(animateB);}
+
+        // --- XOX ---
+        let board_xox = ['', '', '', '', '', '', '', '', ''];
+        function makeMove(i) { if (board_xox[i] === '') { board_xox[i] = 'X'; renderXox(); if(!checkXox()) setTimeout(aiXox, 400); } }
+        function aiXox() { let a = board_xox.map((v,i)=>v===''?i:null).filter(v=>v!==null); if(a.length) { board_xox[a[Math.floor(Math.random()*a.length)]]='O'; renderXox(); checkXox(); } }
+        function checkXox() { const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(let s of w) { if(board_xox[s[0]] && board_xox[s[0]]===board_xox[s[1]] && board_xox[s[0]]===board_xox[s[2]]) { alert(board_xox[s[0]]+" WIN!"); resetGame(); return true; } } if(!board_xox.includes('')) { alert("SERI!"); resetGame(); return true; } return false; }
+        function renderXox() { document.querySelectorAll('.cell').forEach((c,i)=>c.innerText=board_xox[i]); }
+        function resetGame() { board_xox = ['', '', '', '', '', '', '', '', '']; renderXox(); }
+
+        // --- TEXT SCRAMBLE ---
+        class TextScramble { constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); } setText(newText) { const oldText = this.el.innerText; const length = Math.max(oldText.length, newText.length); const promise = new Promise((resolve) => this.resolve = resolve); this.queue = []; for (let i = 0; i < length; i++) { const from = oldText[i] || ''; const to = newText[i] || ''; const start = Math.floor(Math.random() * 40); const end = start + Math.floor(Math.random() * 40); this.queue.push({ from, to, start, end }); } cancelAnimationFrame(this.frameRequest); this.frame = 0; this.update(); return promise; } update() { let output = ''; let complete = 0; for (let i = 0, n = this.queue.length; i < n; i++) { let { from, to, start, end, char } = this.queue[i]; if (this.frame >= end) { complete++; output += to; } else if (this.frame >= start) { if (!char || Math.random() < 0.28) { char = this.chars[Math.floor(Math.random() * this.chars.length)]; this.queue[i].char = char; } output += `<span style="color: #666;">${char}</span>`; } else { output += from; } } this.el.innerHTML = output; if (complete === this.queue.length) this.resolve(); else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; } } }
+        const fx = new TextScramble(document.getElementById('scramble-text'));
+        const runScramble = () => { fx.setText('RommyXploit'); setTimeout(runScramble, 10000); }; runScramble();
+
+
+        
+        // (Isi logic Pacman & Sudoku dari balasan sebelumnya di sini agar tidak hilang)
+
+        // 4. SCRIPT LAMA KAMU (XOX, PONG, DLL)
+        // [INFO: Karena kode lamamu terpotong saat dikirim, saya sudah setup fungsi aman. Kalau kamu masih menyimpan script lama untuk game Pong, Snake, Dino, dsb, letakkan codenya di baris ini]. 
+
+        // 5. PENYAMBUNG TOMBOL (SUDOKU & PACMAN)
+        document.addEventListener('click', function (e) {
+            if (e.target.innerText) {
+                if (e.target.innerText.includes("PAC-MAN")) {
+                    stopAllGames(); toggleModal('menuModal'); toggleModal('pacmanModal'); setTimeout(initPacman, 200);
+                }
+                if (e.target.innerText.includes("SUDOKU")) {
+                    stopAllGames(); toggleModal('menuModal'); toggleModal('sudokuModal'); setTimeout(initSudoku, 200);
+                }
+            }
+        });
+
+        // 6. LOGIC SUDOKU FINAL MOBILE
+        let sudokuLives = 3;
+        let selectedCell = null;
+        const sudokuSolution = [[5,3,4,6,7,8,9,1,2],[6,7,2,1,9,5,3,4,8],[1,9,8,3,4,2,5,6,7],[8,5,9,7,6,1,4,2,3],[4,2,6,8,5,3,7,9,1],[7,1,3,9,2,4,8,5,6],[9,6,1,5,3,7,2,8,4],[2,8,7,4,1,9,6,3,5],[3,4,5,2,8,6,1,7,9]];
+        const sudokuPuzzle = [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]];
+
+        function initSudoku() {
+            sudokuLives = 3; selectedCell = null;
+            const header = document.querySelector("#sudokuModal .modal-header span");
+            if(header) header.innerHTML = `SUDOKU | ${"❤️".repeat(sudokuLives)}`;
+            
+            const container = document.getElementById("sudokuContainer");
+            const keypad = document.getElementById("sudokuKeypad");
+            if(!container || !keypad) return;
+            container.innerHTML = ""; keypad.innerHTML = "";
+
+            for(let r=0; r<9; r++) {
+                for(let c=0; c<9; c++) {
+                    const cell = document.createElement("div");
+                    cell.className = "sudoku-cell";
+                    if ((c + 1) % 3 === 0 && c < 8) cell.style.borderRight = "2px solid #000";
+                    if ((r + 1) % 3 === 0 && r < 8) cell.style.borderBottom = "2px solid #000";
+
+                    if(sudokuPuzzle[r][c] !== 0) {
+                        cell.classList.add("fixed"); cell.innerText = sudokuPuzzle[r][c];
+                    } else {
+                        cell.dataset.row = r; cell.dataset.col = c;
+                        cell.onclick = function() {
+                            document.querySelectorAll('.sudoku-cell').forEach(el => el.style.background = (el.classList.contains('fixed') ? '#efefef' : '#fff'));
+                            this.style.background = "#e0e0ff"; selectedCell = this;
+                        };
+                    }
+                    container.appendChild(cell);
+                }
+            }
+
+            for(let i=1; i<=9; i++) {
+                const btn = document.createElement("button");
+                btn.className = "btn-action"; btn.innerText = i;
+                btn.onclick = function() {
+                    if(selectedCell) {
+                        const r = selectedCell.dataset.row, c = selectedCell.dataset.col;
+                        if(i === sudokuSolution[r][c]) {
+                            selectedCell.innerText = i; selectedCell.style.color = "green"; selectedCell.style.background = "#eaffea";
+                            selectedCell.onclick = null; selectedCell = null;
+                        } else {
+                            selectedCell.style.background = "#ffeaea"; sudokuLives--;
+                            if(header) header.innerHTML = `SUDOKU | ${"❤️".repeat(sudokuLives)}`;
+                            if(sudokuLives <= 0) { alert("GAME OVER! NYAWA HABIS."); initSudoku(); } 
+                            else { setTimeout(() => selectedCell.style.background = "#fff", 300); }
+                        }
+                    }
+                };
+                keypad.appendChild(btn);
+            }
+        }
+
+        // 7. LOGIC PAC-MAN FINAL
+        const pacCanvas = document.getElementById("pacmanCanvas");
+        const pacCtx = pacCanvas ? pacCanvas.getContext("2d") : null;
+        let pacReq, pacRunning = false, pacPos = {x: 1, y: 1}, pacDir = {x: 0, y: 0}, nextDir = {x: 0, y: 0}, ghostPos = {x: 12, y: 5};
+        let pellets = [];
+        const tileSize = 20;
+        const pacMaze = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,1,0,0,0,0,1,0,0,0,1],
+            [1,0,1,0,1,0,1,1,0,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,0,1,1,0,1,1,0,1,0,1,1],
+            [1,0,0,0,0,0,0,1,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        function initPacman() {
+            if(!pacCtx) return;
+            pacRunning = false; pacPos = {x: 1, y: 1}; pacDir = {x: 1, y: 0}; nextDir = {x: 1, y: 0}; ghostPos = {x: 12, y: 5}; pellets = [];
+            for(let r=0; r<pacMaze.length; r++) { for(let c=0; c<pacMaze[r].length; c++) { if(pacMaze[r][c] === 0) pellets.push({x: c, y: r, s: 1}); } }
+            drawPac(); document.getElementById('startPacmanBtn').style.display = 'block';
+        }
+
+        function startPacman() { pacRunning = true; document.getElementById('startPacmanBtn').style.display = 'none'; animatePac(); }
+
+        function drawPac() {
+            pacCtx.clearRect(0,0,280,250);
+            for(let r=0; r<pacMaze.length; r++) { for(let c=0; c<pacMaze[r].length; c++) { if(pacMaze[r][c] === 1) { pacCtx.fillStyle = "#000"; pacCtx.fillRect(c*tileSize, r*tileSize, tileSize, tileSize); } } }
+            pacCtx.fillStyle = "#999"; pellets.forEach(p => { if(p.s) { pacCtx.beginPath(); pacCtx.arc(p.x*tileSize+10, p.y*tileSize+10, 2, 0, 7); pacCtx.fill(); }});
+            pacCtx.fillStyle = "#f1c40f"; pacCtx.font = "16px FontAwesome"; pacCtx.fillText("\uf557", pacPos.x*tileSize+2, pacPos.y*tileSize+16);
+            pacCtx.fillStyle = "#e74c3c"; pacCtx.fillText("\uf6e2", ghostPos.x*tileSize+2, ghostPos.y*tileSize+16);
+        }
+
+        function animatePac() {
+            if(!pacRunning) return;
+            if(pacMaze[pacPos.y + nextDir.y] && pacMaze[pacPos.y + nextDir.y][pacPos.x + nextDir.x] === 0) pacDir = nextDir;
+            let nx = pacPos.x + pacDir.x, ny = pacPos.y + pacDir.y;
+            if(pacMaze[ny] && pacMaze[ny][nx] === 0) { pacPos.x = nx; pacPos.y = ny; }
+            pellets.forEach(p => { if(p.x === pacPos.x && p.y === pacPos.y) p.s = 0; });
+
+            let gx = ghostPos.x, gy = ghostPos.y, dx = pacPos.x - gx, dy = pacPos.y - gy;
+            let moveX = dx !== 0 ? Math.sign(dx) : 0, moveY = dy !== 0 ? Math.sign(dy) : 0;
+            if(Math.random() < 0.7) {
+                if(moveX !== 0 && pacMaze[gy][gx + moveX] === 0) gx += moveX;
+                else if(moveY !== 0 && pacMaze[gy + moveY][gx] === 0) gy += moveY;
+                else {
+                    let dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}], rd = dirs[Math.floor(Math.random()*4)];
+                    if(pacMaze[gy+rd.y] && pacMaze[gy+rd.y][gx+rd.x] === 0) { gx+=rd.x; gy+=rd.y; }
+                }
+            }
+            ghostPos.x = gx; ghostPos.y = gy;
+
+            if(pacPos.x === ghostPos.x && pacPos.y === ghostPos.y) { alert("CAUGHT BY ADMIN!"); initPacman(); return; }
+            if(pellets.every(p => p.s === 0)) { alert("SYSTEM HACKED!"); initPacman(); return; }
+            drawPac(); setTimeout(() => { pacReq = requestAnimationFrame(animatePac); }, 180);
+        }
+
+        window.addEventListener("keydown", function(e) {
+            const pacM = document.getElementById("pacmanModal");
+            if(pacM && pacM.style.display === 'block') {
+                if(e.key === "ArrowLeft")  { nextDir = {x: -1, y: 0}; e.preventDefault(); }
+                if(e.key === "ArrowRight") { nextDir = {x: 1, y: 0}; e.preventDefault(); }
+                if(e.key === "ArrowUp")    { nextDir = {x: 0, y: -1}; e.preventDefault(); }
+                if(e.key === "ArrowDown")  { nextDir = {x: 0, y: 1}; e.preventDefault(); }
+            }
+        }, false);
+        
+        
+                // --- FUNCTION TOGGLE MODE TERANG/GELAP ---
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById("themeIcon");
+            
+            // Cek apakah mode gelap sudah aktif
+            if (body.hasAttribute("data-theme")) {
+                // Balikkan ke Mode Terang
+                body.removeAttribute("data-theme");
+                icon.className = "fas fa-moon"; // Ganti icon jadi bulan
+                localStorage.setItem("theme", "light"); // Simpan pilihan user
+            } else {
+                // Aktifkan Mode Gelap
+                body.setAttribute("data-theme", "dark");
+                icon.className = "fas fa-sun"; // Ganti icon jadi matahari
+                localStorage.setItem("theme", "dark"); // Simpan pilihan user
+            }
+        }
+
+        // --- TAMBAHAN: AUTO CEK TEMA SAAT HALAMAN DIBUKA ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.setAttribute("data-theme", "dark");
+                const icon = document.getElementById("themeIcon");
+                if(icon) icon.className = "fas fa-sun";
+            }
+        });
+        
+        function toggleCharMenu() {
+    const menu = document.getElementById('charOverlay');
+    if(menu) {
+        menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+    }
+}
+
+function setChar(c) {
+    currentChar = c; // Mengubah karakter game
+    if(!dinoRunning) drawD(); // Gambar ulang canvas dengan icon baru
+    toggleCharMenu(); // Langsung tutup pop-up setelah pilih
+}
+
+let simonSeq = []; 
+let userSeq = [];  
+let isWaitingSimon = false; 
+let level = 1;
+
+function startSimon() {
+    level = 1;
+    simonSeq = [];
+    userSeq = [];
+    document.getElementById('currentLevel').innerText = level;
+    document.getElementById('startSimonBtn').style.display = 'none';
+    simonNextRound();
+}
+
+function simonNextRound() {
+    userSeq = [];
+    isWaitingSimon = false;
+    document.getElementById('statusSimon').innerText = "WATCH!";
+    simonSeq.push(Math.floor(Math.random() * 4));
+    setTimeout(playSimonSeq, 800);
+}
+
+async function playSimonSeq() {
+    for (let s of simonSeq) {
+        await new Promise(r => setTimeout(r, 600)); 
+        flashIndicator(s);
+    }
+    isWaitingSimon = true;
+    document.getElementById('statusSimon').innerText = "YOUR TURN";
+}
+
+function flashIndicator(id) {
+    const dot = document.getElementById(`dot${id}`);
+    const btn = document.getElementById(`sim${id}`);
+    if(!dot) return;
+    
+    dot.classList.add('active');
+    btn.style.borderColor = "var(--text)"; // Highlight border sedikit
+    
+    setTimeout(() => { 
+        dot.classList.remove('active');
+        btn.style.borderColor = ""; 
+    }, 400);
+}
+
+function userClick(id) {
+    if(!isWaitingSimon) return; 
+    
+    flashIndicator(id);
+    userSeq.push(id);
+    
+    const lastIdx = userSeq.length - 1;
+    
+    if(userSeq[lastIdx] !== simonSeq[lastIdx]) {
+        isWaitingSimon = false;
+        document.getElementById('statusSimon').innerText = "GAME OVER!";
+        setTimeout(() => {
+            document.getElementById('startSimonBtn').style.display = 'block';
+            document.getElementById('startSimonBtn').innerText = "PLAY AGAIN";
+        }, 1000);
+        return;
+    }
+    
+    if(userSeq.length === simonSeq.length) {
+        isWaitingSimon = false; 
+        level++;
+        document.getElementById('statusSimon').innerText = "PERFECT!";
+        setTimeout(() => {
+            document.getElementById('currentLevel').innerText = level;
+            simonNextRound();
+        }, 1000); 
+    }
+}
+
+let currentTarget = 1;
+let startTime;
+let timerInterval;
+
+function openBurst() {
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    document.getElementById('burstModal').style.display = 'block';
+    startBurst();
+}
+
+function startBurst() {
+    currentTarget = 1;
+    clearInterval(timerInterval);
+    document.getElementById('burstTimer').innerText = "0.00s";
+    const container = document.getElementById('burstGrid');
+    container.innerHTML = '';
+
+    // Acak angka 1-9
+    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
+
+    numbers.forEach(num => {
+        const cell = document.createElement('div');
+        cell.className = 'burst-cell';
+        cell.innerText = num;
+        cell.onclick = function() {
+            if (num === currentTarget) {
+                if (currentTarget === 1) startTimer();
+                this.classList.add('correct');
+                this.onclick = null;
+                currentTarget++;
+                if (currentTarget > 9) winBurst();
+            }
+        };
+        container.appendChild(cell);
+    });
+}
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+        let elapsed = (Date.now() - startTime) / 1000;
+        document.getElementById('burstTimer').innerText = elapsed.toFixed(2) + "s";
+    }, 10);
+}
+
+function winBurst() {
+    clearInterval(timerInterval);
+    alert("FINISH! Time: " + document.getElementById('burstTimer').innerText);
+}
+let board = [];
+let selectedPiece = null;
+let turn = 1; // 1: Putih, 2: Hitam
+
+function openDam() {
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    document.getElementById('damModal').style.display = 'block';
+    initDam();
+}
+
+function initDam() {
+    turn = 1;
+    selectedPiece = null;
+    document.getElementById('statusDam').innerText = "PLAYER 1 TURN (WHITE)";
+    const container = document.getElementById('damGrid');
+    container.innerHTML = '';
+    board = Array(25).fill(0);
+
+    // Pasang bidak awal (Player 1 di atas, Player 2 di bawah)
+    board[0] = 1; board[2] = 1; board[4] = 1; // Baris 1
+    board[20] = 2; board[22] = 2; board[24] = 2; // Baris 5
+
+    renderBoard();
+}
+
+function renderBoard() {
+    const container = document.getElementById('damGrid');
+    container.innerHTML = '';
+    board.forEach((val, i) => {
+        const cell = document.createElement('div');
+        cell.className = `dam-cell ${(Math.floor(i/5) + i)%2 == 0 ? 'light' : 'dark'}`;
+        
+        if(val !== 0) {
+            const piece = document.createElement('div');
+            piece.className = `piece player${val} ${selectedPiece === i ? 'selected' : ''}`;
+            cell.appendChild(piece);
+        }
+
+        cell.onclick = () => handleCellClick(i);
+        container.appendChild(cell);
+    });
+}
+
+function handleCellClick(i) {
+    if (selectedPiece === null) {
+        if (board[i] === turn) {
+            selectedPiece = i;
+        }
+    } else {
+        // Logika Gerak Sederhana (Diagonal)
+        if (board[i] === 0) {
+            movePiece(selectedPiece, i);
+        } else if (board[i] === turn) {
+            selectedPiece = i; // Ganti pilihan
+        }
+    }
+    renderBoard();
+}
+
+function movePiece(from, to) {
+    // Pindah bidak
+    board[to] = board[from];
+    board[from] = 0;
+    
+    // Ganti Giliran
+    turn = turn === 1 ? 2 : 1;
+    document.getElementById('statusDam').innerText = turn === 1 ? "PLAYER 1 TURN (WHITE)" : "PLAYER 2 TURN (BLACK)";
+    selectedPiece = null;
+}
+
+let s_canvas, s_ctx;
+let s_score = 0;
+let s_speed = 2;
+let s_currentBlock = {};
+let s_placedBlocks = [];
+let s_isGameActive = false;
+const S_BOX_HEIGHT = 30;
+
+function initStack() {
+    s_canvas = document.getElementById('stackCanvas');
+    s_ctx = s_canvas.getContext('2d');
+    s_score = 0;
+    s_speed = 2;
+    s_isGameActive = true;
+    
+    document.getElementById('stackScore').innerText = s_score;
+    document.getElementById('stackBtn').style.display = 'none';
+    
+    // Blok dasar (fondasi)
+    s_placedBlocks = [{
+        x: 50,
+        y: s_canvas.height - S_BOX_HEIGHT,
+        w: 200
+    }];
+    
+    s_newBlock();
+    s_animate();
+}
+
+function s_newBlock() {
+    let last = s_placedBlocks[s_placedBlocks.length - 1];
+    s_currentBlock = {
+        x: 0,
+        y: last.y - S_BOX_HEIGHT,
+        w: last.w,
+        dir: 1
+    };
+}
+
+function s_animate() {
+    if (!s_isGameActive) return;
+
+    s_ctx.clearRect(0, 0, s_canvas.width, s_canvas.height);
+
+    // Gambar tumpukan balok yang sudah fix (Putih)
+    s_ctx.fillStyle = "#ffffff";
+    s_placedBlocks.forEach(b => {
+        s_ctx.fillRect(b.x, b.y, b.w, S_BOX_HEIGHT - 2);
+    });
+
+    // Gerakkan balok aktif
+    s_currentBlock.x += s_speed * s_currentBlock.dir;
+    if (s_currentBlock.x + s_currentBlock.w > s_canvas.width || s_currentBlock.x < 0) {
+        s_currentBlock.dir *= -1;
+    }
+
+    // Gambar balok yang sedang gerak (Abu-abu)
+    s_ctx.fillStyle = "#888888";
+    s_ctx.fillRect(s_currentBlock.x, s_currentBlock.y, s_currentBlock.w, S_BOX_HEIGHT - 2);
+
+    requestAnimationFrame(s_animate);
+}
+
+function handleStackClick() {
+    if (!s_isGameActive) return;
+
+    let last = s_placedBlocks[s_placedBlocks.length - 1];
+    
+    // Hitung sisa potongan (Overlap)
+    let left = Math.max(s_currentBlock.x, last.x);
+    let right = Math.min(s_currentBlock.x + s_currentBlock.w, last.x + last.w);
+    let newWidth = right - left;
+
+    if (newWidth <= 0) {
+        // Game Over
+        s_isGameActive = false;
+        const btn = document.getElementById('stackBtn');
+        btn.style.display = 'block';
+        btn.innerText = "GAME OVER! RESTART";
+        return;
+    }
+
+    // Pasang balok dengan lebar yang sudah terpotong
+    s_placedBlocks.push({
+        x: left,
+        y: s_currentBlock.y,
+        w: newWidth
+    });
+
+    s_score++;
+    document.getElementById('stackScore').innerText = s_score;
+    s_speed += 0.2; // Tambah kecepatan biar makin susah
+
+    // Geser kamera ke bawah jika tumpukan sudah tinggi
+    if (s_placedBlocks.length > 7) {
+        s_placedBlocks.forEach(b => b.y += S_BOX_HEIGHT);
+    }
+
+    s_newBlock();
+}
+
+// Fungsi bantu untuk tombol menu
+function openStackGame() {
+    // Sembunyikan modal lain jika ada
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    document.getElementById('stackModal').style.display = 'block';
+}
+/* --- GAME DECRYPTOR (SAFE MODE) --- */
+const dec_wordList = ["DATABASE", "FIREWALL", "PHISHING", "MALWARE", "ENCRYPT", "NETWORK", "DECRYPT", "EXPLOIT", "SERVER", "TERMINAL"];
+let dec_answer = "";
+
+function openDecryptor() {
+    // Tutup menu utama jika ada
+    if(document.getElementById('menuModal')) document.getElementById('menuModal').style.display = 'none';
+    
+    // Tampilkan modal decryptor
+    const modal = document.getElementById('decryptorModal');
+    if(modal) {
+        modal.style.display = 'block';
+        initDecGame();
+    }
+}
+
+function initDecGame() {
+    // Pilih kata acak
+    dec_answer = dec_wordList[Math.floor(Math.random() * dec_wordList.length)];
+    
+    // Acak huruf
+    let scrambled = dec_answer.split('').sort(() => Math.random() - 0.5).join('');
+    
+    // Pastikan hasil acak tidak sama dengan aslinya
+    while(scrambled === dec_answer) {
+        scrambled = dec_answer.split('').sort(() => Math.random() - 0.5).join('');
+    }
+    
+    // Tampilkan ke layar
+    document.getElementById('dec_scrambledBox').innerText = scrambled;
+    document.getElementById('dec_statusMsg').innerText = "STATUS: WAITING INPUT";
+    document.getElementById('dec_statusMsg').style.color = "var(--text)";
+    document.getElementById('dec_userInput').value = "";
+    
+    // Auto focus ke input setelah modal muncul
+    setTimeout(() => document.getElementById('dec_userInput').focus(), 200);
+}
+
+function processDecryption() {
+    const inputField = document.getElementById('dec_userInput');
+    const userGuess = inputField.value.trim().toUpperCase();
+    const statusLabel = document.getElementById('dec_statusMsg');
+
+    if (userGuess === dec_answer) {
+        statusLabel.innerText = "ACCESS GRANTED! KODE BENAR.";
+        statusLabel.style.color = "#00ff00"; 
+        
+        // Efek kedip saat menang
+        document.getElementById('dec_scrambledBox').style.opacity = "0.5";
+        
+        setTimeout(() => {
+            document.getElementById('dec_scrambledBox').style.opacity = "1";
+            initDecGame(); // Reset game untuk ronde berikutnya
+        }, 1200);
+    } else {
+        statusLabel.innerText = "ACCESS DENIED! KODE SALAH.";
+        statusLabel.style.color = "#ff3d00";
+        inputField.value = "";
+    }
+}
+
+// Tambahkan listener tombol Enter khusus untuk input decryptor
+document.getElementById('dec_userInput')?.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') processDecryption();
+});
+/* --- MYSTERY CHAT PRO VERSION --- */
+var st_currentStep = "START";
+var st_userName = "";
+var st_isTyping = false;
+var st_lives = 3;
+
+const st_storyData = {
+    "START": "> Menerima transmisi...\n> Halo? Koneksi terdeteksi.\n> Siapa namamu?",
+    "GREETING": "> Salam kenal, {name}.\n> Aku terjebak di modul observasi. Oksigen menipis.\n> Aku melihat dua pintu di depanku.\n\nA. Pintu Lab (Bercahaya Merah)\nB. Pintu Palka (Gelap Gulita)\nC. Cek Panel Kontrol",
+    
+    // RUTE LAB
+    "LAB": "> Kamu masuk ke Lab. Ada sebuah komputer tua yang berkedip dan sebuah loker terkunci.\n\nA. Hack Sistem Komputer\nB. Paksa Buka Loker",
+    "HACK_SUCCESS": "> Berhasil! Kamu menemukan peta kapal. Ada jalan rahasia ke Ruang Mesin.\n\nA. Pergi ke Ruang Mesin\nB. Tetap di Lab mencari barang lain",
+    
+    // RUTE PALKA
+    "PALKA": "> Pintu Palka sangat berat. Saat terbuka, hawa dingin menusuk tulang.\n> Ada sesosok bayangan di ujung lorong.\n\nA. Teriak Memanggil\nB. Sembunyi di balik peti\nC. Lari kembali ke luar",
+    
+    // RUTE PANEL (CABANG BARU)
+    "PANEL": "> Panel kontrol rusak parah, tapi ada kabel yang menjuntai.\n\nA. Sambungkan kabel Merah\nB. Sambungkan kabel Biru",
+    
+    // RUTE ENGINE (MENUJU AKHIR)
+    "ENGINE": "> Kamu di Ruang Mesin. Generator utama mati.\n> Jika ini tidak nyala, kita semua tamat.\n\nA. Tarik Tuas Darurat\nB. Masukkan Kode Manual",
+
+    // ENDINGS
+    "WIN": "> GENERATOR AKTIF! Lampu kapal menyala.\n> Sinyal bantuan terkirim ke markas pusat.\n> Selamat, {name}. Kita berhasil selamat!",
+    "DEAD_OXY": "> Oksigen habis... pandanganmu kabur.\n> Kamu tewas dalam kegelapan.",
+    "DEAD_VOID": "> Tekanan udara hilang! Kamu terlempar ke ruang hampa.\n> Kamu tewas seketika.",
+    "DEAD_SHADOW": "> Bayangan itu ternyata sistem keamanan robot yang malfungsi.\n> Kamu dieksekusi di tempat."
+};
+
+function updateLifeDisplay() {
+    document.getElementById('st_lifeDisplay').innerHTML = `<i class="fas fa-heart"></i> ${st_lives}`;
+}
+
+function openStoryGame() {
+    if(document.getElementById('menuModal')) document.getElementById('menuModal').style.display = 'none';
+    const sModal = document.getElementById('storyModal');
+    if(sModal) {
+        sModal.style.display = 'block';
+        st_currentStep = "START";
+        st_lives = 3;
+        updateLifeDisplay();
+        document.getElementById('storyBox').innerHTML = "";
+        playStoryEffect(st_storyData["START"]);
+    }
+}
+
+function closeStoryGame() {
+    document.getElementById('storyModal').style.display = 'none';
+}
+
+function playStoryEffect(msg) {
+    st_isTyping = true;
+    document.getElementById('storyInputArea').style.display = "none";
+    let container = document.getElementById('storyBox');
+    let wrap = document.createElement("div");
+    wrap.style.display = "flex"; wrap.style.gap = "10px";
+    wrap.innerHTML = `<i class="fas fa-robot" style="font-size:0.8rem; margin-top:3px;"></i><div class="txt-content"></div>`;
+    container.appendChild(wrap);
+    
+    let target = wrap.querySelector(".txt-content");
+    let i = 0;
+    function type() {
+        if (i < msg.length) {
+            target.innerText += msg.charAt(i);
+            i++;
+            container.scrollTop = container.scrollHeight;
+            setTimeout(type, 30);
+        } else {
+            st_isTyping = false;
+            document.getElementById('storyInputArea').style.display = "block";
+            document.getElementById('storyUserInp').focus();
+        }
+    }
+    type();
+}
+
+function handleWrongMove(deathMsg) {
+    st_lives--;
+    updateLifeDisplay();
+    if(st_lives > 0) {
+        playStoryEffect(deathMsg + `\n\n[ SISTEM RECOVERY: Sisa Nyawa ${st_lives} ]\n> Mencoba kembali ke posisi sebelumnya...`);
+        // Tidak mengubah st_currentStep agar pemain bisa pilih lagi
+    } else {
+        playStoryEffect(st_storyData["DEAD_OXY"] + "\n\n[ GAME OVER - SYSTEM CRITICAL ]");
+        st_currentStep = "START";
+    }
+}
+
+function handleStoryInput() {
+    if (st_isTyping) return;
+    let inp = document.getElementById('storyUserInp').value.trim().toUpperCase();
+    if (!inp) return;
+
+    let box = document.getElementById('storyBox');
+    box.innerHTML += `<div style="display:flex; gap:10px; justify-content:flex-end; margin:10px 0;"><div style="text-align:right;">${inp}</div><i class="fas fa-user-code" style="font-size:0.8rem; margin-top:3px;"></i></div>`;
+    document.getElementById('storyUserInp').value = "";
+
+    setTimeout(() => {
+        // LOGIKA PERCABANGAN CERITA
+        if (st_currentStep === "START") {
+            st_userName = inp; st_currentStep = "GREETING";
+            playStoryEffect(st_storyData["GREETING"].replace("{name}", st_userName));
+        } 
+        else if (st_currentStep === "GREETING") {
+            if (inp === "A") { st_currentStep = "LAB"; playStoryEffect(st_storyData["LAB"]); }
+            else if (inp === "B") { st_currentStep = "PALKA"; playStoryEffect(st_storyData["PALKA"]); }
+            else if (inp === "C") { st_currentStep = "PANEL"; playStoryEffect(st_storyData["PANEL"]); }
+            else { playStoryEffect("> ERROR: Pilih A, B, atau C."); }
+        }
+        else if (st_currentStep === "LAB") {
+            if (inp === "A") { st_currentStep = "HACK_SUCCESS"; playStoryEffect(st_storyData["HACK_SUCCESS"]); }
+            else if (inp === "B") { handleWrongMove("> Loker meledak karena jebakan keamanan!"); }
+        }
+        else if (st_currentStep === "HACK_SUCCESS") {
+            if (inp === "A") { st_currentStep = "ENGINE"; playStoryEffect(st_storyData["ENGINE"]); }
+            else { handleWrongMove("> Kamu terlalu lama di Lab, gas beracun bocor!"); }
+        }
+        else if (st_currentStep === "PALKA") {
+            if (inp === "B") { st_currentStep = "ENGINE"; playStoryEffect("> Kamu berhasil menyelinap melewati robot itu dan sampai di Ruang Mesin.\n" + st_storyData["ENGINE"]); }
+            else { handleWrongMove(st_storyData["DEAD_SHADOW"]); }
+        }
+        else if (st_currentStep === "PANEL") {
+            if (inp === "B") { st_currentStep = "GREETING"; playStoryEffect("> Listrik menyala sebentar, kamu kembali ke lorong utama.\n" + st_storyData["GREETING"].replace("{name}", st_userName)); }
+            else { handleWrongMove("> Konsleting listrik! Kamu tersengat."); }
+        }
+        else if (st_currentStep === "ENGINE") {
+            if (inp === "B") { st_currentStep = "WIN"; playStoryEffect(st_storyData["WIN"]); }
+            else { handleWrongMove("> Tuas itu patah! Sistem penguncian aktif."); }
+        }
+    }, 600);
+}
+
+document.getElementById('storyUserInp')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleStoryInput(); });
+
+/* --- MATH BREAKER SYSTEM --- */
+let mt_correctScore = 0;
+let mt_wrongScore = 0;
+let mt_currentAnswer = 0;
+
+function openMathGame() {
+    if(document.getElementById('menuModal')) document.getElementById('menuModal').style.display = 'none';
+    document.getElementById('mathModal').style.display = 'block';
+    mt_correctScore = 0;
+    mt_wrongScore = 0;
+    updateMathUI();
+    generateMathQuestion();
+}
+
+function closeMathGame() {
+    document.getElementById('mathModal').style.display = 'none';
+}
+
+function updateMathUI() {
+    document.getElementById('math_correct').innerText = mt_correctScore;
+    document.getElementById('math_wrong').innerText = mt_wrongScore;
+}
+
+function generateMathQuestion() {
+    const operators = ['+', '-', '×', '÷'];
+    const op = operators[Math.floor(Math.random() * operators.length)];
+    let n1, n2, qText;
+
+    switch(op) {
+        case '+':
+            n1 = Math.floor(Math.random() * 50) + 1;
+            n2 = Math.floor(Math.random() * 50) + 1;
+            mt_currentAnswer = n1 + n2;
+            qText = `${n1} + ${n2}`;
+            break;
+        case '-':
+            n1 = Math.floor(Math.random() * 50) + 20;
+            n2 = Math.floor(Math.random() * n1);
+            mt_currentAnswer = n1 - n2;
+            qText = `${n1} - ${n2}`;
+            break;
+        case '×':
+            n1 = Math.floor(Math.random() * 12) + 2;
+            n2 = Math.floor(Math.random() * 10) + 2;
+            mt_currentAnswer = n1 * n2;
+            qText = `${n1} × ${n2}`;
+            break;
+        case '÷':
+            mt_currentAnswer = Math.floor(Math.random() * 10) + 1;
+            n2 = Math.floor(Math.random() * 10) + 1;
+            n1 = mt_currentAnswer * n2;
+            qText = `${n1} ÷ ${n2}`;
+            break;
+    }
+
+    document.getElementById('math_question').innerText = qText;
+
+    // Buat jawaban salah yang masuk akal
+    let wrongAnswer;
+    do {
+        let offset = Math.floor(Math.random() * 10) - 5;
+        if(offset === 0) offset = 2;
+        wrongAnswer = mt_currentAnswer + offset;
+    } while (wrongAnswer === mt_currentAnswer || wrongAnswer < 0);
+
+    // Acak posisi tombol
+    if (Math.random() > 0.5) {
+        document.getElementById('math_btn1').innerText = mt_currentAnswer;
+        document.getElementById('math_btn2').innerText = wrongAnswer;
+    } else {
+        document.getElementById('math_btn1').innerText = wrongAnswer;
+        document.getElementById('math_btn2').innerText = mt_currentAnswer;
+    }
+}
+
+function checkMathAnswer(btn) {
+    const userAnswer = parseInt(btn.innerText);
+    const feedback = document.getElementById('math_feedback');
+
+    if (userAnswer === mt_currentAnswer) {
+        mt_correctScore++;
+        feedback.innerText = "EXCELLENT! +1";
+        feedback.style.color = "green";
+    } else {
+        mt_wrongScore++;
+        feedback.innerText = "SYSTEM ERROR! WRONG";
+        feedback.style.color = "red";
+    }
+
+    updateMathUI();
+    
+    // Animasi tombol sebentar lalu ganti soal
+    btn.style.background = "var(--text)";
+    btn.style.color = "var(--bg)";
+    
+    setTimeout(() => {
+        btn.style.background = "none";
+        btn.style.color = "var(--text)";
+        generateMathQuestion();
+    }, 300);
+}
+/* --- CYBER CHECKERS ULTIMATE (KING & MULTI-JUMP) --- */
+var ck_boardData = [];
+var ck_selected = null;
+var ck_turn = "blue"; 
+var ck_isMultiJump = false;
+
+function openCheckers() {
+    // Sembunyikan menu utama jika fungsi toggleModal tersedia
+    if(typeof toggleModal === "function") {
+        document.getElementById('menuModal').style.display = 'none';
+    }
+    document.getElementById('checkersModal').style.display = 'block';
+    initCheckers();
+}
+
+function closeCheckers() {
+    document.getElementById('checkersModal').style.display = 'none';
+    ck_selected = null;
+    ck_isMultiJump = false;
+}
+
+function initCheckers() {
+    ck_boardData = Array(8).fill().map(() => Array(8).fill(null));
+    ck_turn = "blue";
+    ck_selected = null;
+    ck_isMultiJump = false;
+    document.getElementById('ck_status').innerText = "YOUR TURN (BLUE)";
+    
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            if ((r + c) % 2 !== 0) {
+                if (r < 3) ck_boardData[r][c] = { color: "red", isKing: false };
+                else if (r > 4) ck_boardData[r][c] = { color: "blue", isKing: false };
+            }
+        }
+    }
+    renderCheckers();
+}
+
+function renderCheckers() {
+    const board = document.getElementById('ck_board');
+    if(!board) return;
+    board.innerHTML = "";
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const cell = document.createElement('div');
+            cell.style.background = (r + c) % 2 === 0 ? "var(--bg)" : "#333";
+            cell.style.display = "flex";
+            cell.style.alignItems = "center";
+            cell.style.justifyContent = "center";
+            cell.onclick = () => handleCkClick(r, c);
+
+            if (ck_boardData[r][c]) {
+                const piece = document.createElement('div');
+                piece.style.width = "80%";
+                piece.style.height = "80%";
+                piece.style.borderRadius = "50%";
+                piece.style.display = "flex";
+                piece.style.alignItems = "center";
+                piece.style.justifyContent = "center";
+                piece.style.background = ck_boardData[r][c].color === "blue" ? "#2979FF" : "#FF3D00";
+                piece.style.transition = "all 0.2s";
+                
+                if (ck_boardData[r][c].isKing) {
+                    piece.innerHTML = '<i class="fas fa-crown" style="color:white; font-size:0.6rem;"></i>';
+                }
+                if (ck_selected && ck_selected.r === r && ck_selected.c === c) {
+                    piece.style.border = "3px solid white";
+                    piece.style.boxShadow = "0 0 10px white";
+                }
+                cell.appendChild(piece);
+            }
+            board.appendChild(cell);
+        }
+    }
+}
+
+function handleCkClick(r, c) {
+    if (ck_turn !== "blue") return;
+    const target = ck_boardData[r][c];
+
+    if (target && target.color === "blue" && !ck_isMultiJump) {
+        ck_selected = { r, c };
+    } else if (ck_selected) {
+        if (isValidMove(ck_selected.r, ck_selected.c, r, c, "blue")) {
+            executeMove(ck_selected.r, ck_selected.c, r, c);
+        } else if (!ck_isMultiJump) {
+            ck_selected = null;
+        }
+    }
+    renderCheckers();
+}
+
+function isValidMove(sr, sc, tr, tc, color) {
+    if (tr < 0 || tr > 7 || tc < 0 || tc > 7 || ck_boardData[tr][tc] !== null) return false;
+    const piece = ck_boardData[sr][sc];
+    const dr = tr - sr;
+    const dc = Math.abs(tc - sc);
+    const direction = color === "blue" ? -1 : 1;
+
+    if (piece.isKing) {
+        if (!ck_isMultiJump && Math.abs(dr) === 1 && dc === 1) return true;
+        if (Math.abs(dr) === 2 && dc === 2) {
+            const midR = sr + (dr / 2);
+            const midC = sc + (tc - sc) / 2;
+            const midP = ck_boardData[midR][midC];
+            return midP && midP.color !== color;
+        }
+    } else {
+        if (!ck_isMultiJump && dr === direction && dc === 1) return true;
+        if (dr === direction * 2 && dc === 2) {
+            const midR = sr + direction;
+            const midC = sc + (tc - sc) / 2;
+            const midP = ck_boardData[midR][midC];
+            return midP && midP.color !== color;
+        }
+    }
+    return false;
+}
+
+function executeMove(sr, sc, tr, tc) {
+    const piece = ck_boardData[sr][sc];
+    ck_boardData[tr][tc] = piece;
+    ck_boardData[sr][sc] = null;
+    let jumped = false;
+
+    if (Math.abs(tr - sr) === 2) {
+        ck_boardData[sr + (tr - sr) / 2][sc + (tc - sc) / 2] = null;
+        jumped = true;
+    }
+
+    if ((piece.color === "blue" && tr === 0) || (piece.color === "red" && tr === 7)) {
+        piece.isKing = true;
+    }
+
+    if (jumped && canJumpAgain(tr, tc, piece.color)) {
+        ck_selected = { r: tr, c: tc };
+        ck_isMultiJump = true;
+        renderCheckers();
+        if (piece.color === "red") setTimeout(() => aiMove(tr, tc), 600);
+        return;
+    }
+
+    ck_selected = null;
+    ck_isMultiJump = false;
+    ck_turn = (ck_turn === "blue") ? "red" : "blue";
+    document.getElementById('ck_status').innerText = (ck_turn === "blue") ? "YOUR TURN (BLUE)" : "AI THINKING...";
+    
+    if (ck_turn === "red") setTimeout(() => aiMove(), 800);
+    checkWin();
+}
+
+function canJumpAgain(r, c, color) {
+    const piece = ck_boardData[r][c];
+    const dirs = piece.isKing ? [2, -2] : [ (color === "blue" ? -2 : 2) ];
+    for (let dr of dirs) {
+        for (let dc of [2, -2]) {
+            if (isValidMove(r, c, r + dr, c + dc, color)) return true;
+        }
+    }
+    return false;
+}
+
+function aiMove(forcedR = null, forcedC = null) {
+    let moves = [];
+    if (forcedR !== null) {
+        const piece = ck_boardData[forcedR][forcedC];
+        const dirs = piece.isKing ? [2, -2] : [2];
+        dirs.forEach(dr => {
+            [2, -2].forEach(dc => {
+                if (isValidMove(forcedR, forcedC, forcedR + dr, forcedC + dc, "red")) 
+                    moves.push({sr: forcedR, sc: forcedC, tr: forcedR + dr, tc: forcedC + dc});
+            });
+        });
+    } else {
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                if (ck_boardData[r][c] && ck_boardData[r][c].color === "red") {
+                    const piece = ck_boardData[r][c];
+                    const dirs = piece.isKing ? [1, -1, 2, -2] : [1, 2];
+                    dirs.forEach(dr => {
+                        [1, -1, 2, -2].forEach(dc => {
+                            if (Math.abs(dr) === Math.abs(dc) && isValidMove(r, c, r + dr, c + dc, "red")) 
+                                moves.push({sr: r, sc: c, tr: r + dr, tc: c + dc, p: Math.abs(dr)});
+                        });
+                    });
+                }
+            }
+        }
+    }
+
+    if (moves.length > 0) {
+        moves.sort((a, b) => (b.p || 0) - (a.p || 0));
+        const move = moves[0];
+        executeMove(move.sr, move.sc, move.tr, move.tc);
+    }
+    renderCheckers();
+    checkWin();
+}
+
+function checkWin() {
+    let b = 0, r = 0;
+    ck_boardData.flat().forEach(p => { if(p) { if(p.color === 'blue') b++; else r++; } });
+    if (b === 0) { document.getElementById('ck_status').innerText = "AI WIN!"; alert("RED WINS!"); closeCheckers(); }
+    else if (r === 0) { document.getElementById('ck_status').innerText = "YOU WIN!"; alert("BLUE WINS!"); closeCheckers(); }
+}
+
+/* --- LOGIKA FINAL CYBER CHESS (FIX AI & POPUP) --- */
+const CyberChess = {
+    board: [], selected: null, turn: "white", mode: "pvp", timer: null, seconds: 0, validMoves: [],
+
+    init: function(mode) {
+        this.mode = mode;
+        this.board = Array(8).fill().map(() => Array(8).fill(null));
+        this.turn = "white"; this.selected = null; this.seconds = 0; this.validMoves = [];
+        
+        document.getElementById('ch_modeSelect').style.display = 'none';
+        document.getElementById('ch_resetBtn').style.display = 'block';
+        document.getElementById('ch_status').innerText = "TURN: WHITE";
+        
+        const layout = ['r','n','b','q','k','b','n','r'];
+        for(let i=0; i<8; i++) {
+            this.board[0][i] = { type: layout[i], color: 'black' };
+            this.board[1][i] = { type: 'p', color: 'black' };
+            this.board[6][i] = { type: 'p', color: 'white' };
+            this.board[7][i] = { type: layout[i], color: 'white' };
+        }
+        this.startTimer();
+        this.render();
+    },
+
+    render: function() {
+        const boardEl = document.getElementById('ch_board');
+        boardEl.innerHTML = "";
+        const isCheck = this.isKingInCheck(this.turn);
+        document.getElementById('ch_warning').innerText = isCheck ? "⚠️ KING IN CHECK!" : "";
+
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const cell = document.createElement('div');
+                cell.style.background = (r + c) % 2 === 0 ? "#eee" : "#888";
+                cell.onclick = () => this.handleClick(r, c);
+
+                const piece = this.board[r][c];
+                if (piece) {
+                    const icon = document.createElement('i');
+                    icon.className = `fas fa-chess-${this.getIcon(piece.type)}`;
+                    icon.style.color = piece.color === 'white' ? '#222' : '#ff3d00';
+                    cell.appendChild(icon);
+                }
+
+                if (this.validMoves.some(m => m.r === r && m.c === c)) {
+                    const hint = document.createElement('div');
+                    hint.className = "ch-hint";
+                    cell.appendChild(hint);
+                }
+                
+                if (this.selected && this.selected.r === r && this.selected.c === c) {
+                    cell.style.boxShadow = "inset 0 0 10px #2979ff";
+                }
+                boardEl.appendChild(cell);
+            }
+        }
+    },
+
+    handleClick: function(r, c) {
+        if (this.mode === "pve" && this.turn === "black") return;
+        const piece = this.board[r][c];
+
+        if (piece && piece.color === this.turn) {
+            this.selected = { r, c };
+            this.validMoves = this.calculateSafeMoves(r, c);
+        } else if (this.selected) {
+            if (this.validMoves.some(m => m.r === r && m.c === c)) {
+                this.move(this.selected.r, this.selected.c, r, c);
+                if (this.mode === "pve" && this.turn === "black") {
+                    setTimeout(() => this.aiMove(), 800);
+                }
+            }
+            this.selected = null; this.validMoves = [];
+        }
+        this.render();
+    },
+
+    move: function(sr, sc, tr, tc) {
+        this.board[tr][tc] = this.board[sr][sc];
+        this.board[sr][sc] = null;
+        this.turn = this.turn === "white" ? "black" : "white";
+        document.getElementById('ch_status').innerText = "TURN: " + this.turn.toUpperCase();
+        this.render();
+    },
+
+    aiMove: function() {
+        let moves = [];
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                if(this.board[r][c]?.color === 'black') {
+                    this.calculateSafeMoves(r,c).forEach(m => {
+                        let s = this.board[m.r][m.c] ? 10 : 0;
+                        moves.push({sr:r, sc:c, tr:m.r, tc:m.c, s:s});
+                    });
+                }
+            }
+        }
+        if(moves.length) {
+            moves.sort((a,b) => b.s - a.s);
+            let b = moves[Math.floor(Math.random() * Math.min(3, moves.length))];
+            this.move(b.sr, b.sc, b.tr, b.tc);
+        }
+    },
+
+    calculateSafeMoves: function(sr, sc) {
+        let safe = [];
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                if(this.isValidMove(sr, sc, r, c, this.board)) {
+                    let o = this.board[sr][sc], t = this.board[r][c];
+                    this.board[r][c] = o; this.board[sr][sc] = null;
+                    if(!this.isKingInCheck(this.turn)) safe.push({r, c});
+                    this.board[sr][sc] = o; this.board[r][c] = t;
+                }
+            }
+        } return safe;
+    },
+
+    isKingInCheck: function(color) {
+        let kp = null;
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            if(this.board[r][c]?.type === 'k' && this.board[r][c]?.color === color) kp = {r, c};
+        }
+        if(!kp) return false;
+        let enemy = color === 'white' ? 'black' : 'white';
+        for(let r=0; r<8; r++) for(let c=0; c<8; c++) {
+            if(this.board[r][c]?.color === enemy && this.isValidMove(r, c, kp.r, kp.c, this.board)) return true;
+        } return false;
+    },
+
+    isValidMove: function(sr, sc, tr, tc, b) {
+        const p = b[sr][sc]; if(!p || b[tr][tc]?.color === p.color) return false;
+        const dr = tr - sr, dc = tc - sc, ar = Math.abs(dr), ac = Math.abs(dc);
+        switch(p.type) {
+            case 'p': let v = p.color === 'white' ? -1 : 1;
+                if(dc === 0 && !b[tr][tc]) {
+                    if(dr === v) return true;
+                    if((sr === 6 || sr === 1) && dr === 2*v && !b[sr+v][sc]) return true;
+                } return ac === 1 && dr === v && b[tr][tc];
+            case 'r': return (sr === tr || sc === tc) && this.pathClear(sr,sc,tr,tc,b);
+            case 'b': return ar === ac && this.pathClear(sr,sc,tr,tc,b);
+            case 'n': return (ar === 2 && ac === 1) || (ar === 1 && ac === 2);
+            case 'q': return (ar === ac || sr === tr || sc === tc) && this.pathClear(sr,sc,tr,tc,b);
+            case 'k': return ar <= 1 && ac <= 1;
+        } return false;
+    },
+
+    pathClear: function(sr, sc, tr, tc, b) {
+        let sR = Math.sign(tr-sr), sC = Math.sign(tc-sc);
+        let r = sr+sR, c = sc+sC;
+        while(r !== tr || c !== tc) { if(b[r][c]) return false; r+=sR; c+=sC; }
+        return true;
+    },
+
+    getIcon: (t) => ({p:'pawn',r:'rook',n:'knight',b:'bishop',q:'queen',k:'king'}[t]),
+    startTimer: function() {
+        clearInterval(this.timer);
+        this.timer = setInterval(() => {
+            this.seconds++;
+            let m = Math.floor(this.seconds / 60).toString().padStart(2, '0');
+            let s = (this.seconds % 60).toString().padStart(2, '0');
+            document.getElementById('ch_timer').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+};
+
+/* --- FUNGSI PEMANGGIL MODAL --- */
+function openChess() {
+    // Sembunyikan semua modal lain
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    
+    const modal = document.getElementById('chessModal');
+    if(modal) {
+        modal.style.display = 'block';
+        document.getElementById('ch_modeSelect').style.display = 'flex';
+        document.getElementById('ch_resetBtn').style.display = 'none';
+        document.getElementById('ch_board').innerHTML = ""; 
+        document.getElementById('ch_status').innerText = "SELECT MODE";
+        if(CyberChess.timer) clearInterval(CyberChess.timer);
+    } else {
+        console.error("ID chessModal tidak ditemukan!");
+    }
+}
+
+function closeChess() {
+    document.getElementById('chessModal').style.display = 'none';
+    clearInterval(CyberChess.timer);
+}
+const CyberSim = {
+    view: null, isRunning: false, frame: null, elements: [],
+
+    init: function() {
+        this.view = document.getElementById('landscapeView');
+        if (!this.view) return;
+        this.reset();
+    },
+
+    createEntity: function(type, icon, x, y, size, props) {
+        const wrap = document.createElement('div');
+        wrap.className = 'ls-icon';
+        const bubble = document.createElement('div');
+        bubble.className = 'ls-bubble';
+        const i = document.createElement('i');
+        i.className = `fas ${icon}`;
+        i.style.fontSize = size + 'px';
+        
+        wrap.appendChild(bubble);
+        wrap.appendChild(i);
+        this.view.appendChild(wrap);
+
+        return {
+            dom: wrap, icon: i, bubble: bubble,
+            type: type, x: x, y: y,
+            speed: props.speed || 0, dir: 1,
+            nextChat: Math.random() * 200 + 100,
+            ...props
+        };
+    },
+
+    reset: function() {
+        this.stop();
+        this.view.innerHTML = '<div class="ground-line"></div>';
+        this.elements = [];
+
+        // Objek Langit
+        this.elements.push(this.createEntity('sun', 'fa-sun', 10, 20, 30, { speed: 0.5 }));
+        this.elements.push(this.createEntity('cloud', 'fa-cloud', 60, 15, 20, { speed: 0.2 }));
+
+        // Objek Statis (Rumah & Pohon) sejajar garis
+        this.elements.push(this.createEntity('home', 'fa-home', 180, 110, 40, { speed: 0 }));
+        this.elements.push(this.createEntity('tree', 'fa-tree', 40, 115, 35, { speed: 0 }));
+        this.elements.push(this.createEntity('tree', 'fa-tree', 115, 115, 35, { speed: 0 }));
+
+        // Makhluk Hidup
+        this.elements.push(this.createEntity('bird', 'fa-dove', 0, 50, 14, { speed: 1.4 }));
+        this.elements.push(this.createEntity('pacman', 'fa-ghost', 20, 128, 22, { speed: 0.7 }));
+        this.elements.push(this.createEntity('cat', 'fa-cat', 130, 133, 16, { speed: 0.9 }));
+
+        this.start();
+    },
+
+    update: function() {
+        if (!this.isRunning) return;
+
+        this.elements.forEach(el => {
+            if (el.speed !== 0) {
+                el.x += el.speed * el.dir;
+
+                if (el.type === 'sun') {
+                    if (el.x > 280 || el.x < -40) el.dir *= -1;
+                    
+                    // Kunci perubahan warna HANYA pada landscapeView
+                    let dist = Math.abs(140 - el.x);
+                    let ratio = Math.max(0, 1 - (dist / 140));
+                    let b = Math.floor(ratio * 255);
+                    
+                    this.view.style.backgroundColor = `rgb(${b},${b},${b})`;
+                    this.view.style.color = b > 127 ? '#000' : '#fff';
+                } else {
+                    if (el.x > 320) el.x = -50;
+                    if (el.x < -60) el.x = 300;
+                    if (el.dir > 0) el.icon.classList.remove('mirror');
+                    else el.icon.classList.add('mirror');
+                }
+
+                // Logika Gelembung Komentar (Hanya Karakter)
+                if (['pacman', 'cat', 'bird'].includes(el.type)) {
+                    el.nextChat--;
+                    if (el.nextChat <= 0) {
+                        const words = ["Hi!", "Hello!", "How are you?", "Good!", "Nyan!", "Yo!,"];
+                        el.bubble.innerText = words[Math.floor(Math.random() * words.length)];
+                        el.bubble.style.opacity = 1;
+                        setTimeout(() => el.bubble.style.opacity = 0, 1500);
+                        el.nextChat = Math.random() * 400 + 300;
+                    }
+                }
+            }
+            el.dom.style.transform = `translate(${el.x}px, ${el.y}px)`;
+        });
+
+        if (Math.random() < 0.1) this.spawnRain();
+        this.frame = requestAnimationFrame(() => this.update());
+    },
+
+    spawnRain: function() {
+        const r = document.createElement('div');
+        r.className = 'rain';
+        r.style.left = Math.random() * 280 + 'px';
+        r.style.top = '0px';
+        this.view.appendChild(r);
+        let ry = 0;
+        const fall = setInterval(() => {
+            ry += 5; r.style.top = ry + 'px';
+            if (ry > 180) { clearInterval(fall); r.remove(); }
+        }, 30);
+    },
+
+    start: function() { this.isRunning = true; this.update(); },
+    stop: function() { this.isRunning = false; cancelAnimationFrame(this.frame); }
+};
+
+function openLandscape() {
+    const m = document.getElementById('landscapeModal');
+    if (m) { m.style.display = 'block'; setTimeout(() => CyberSim.init(), 100); }
+}
+
+function closeLandscape() {
+    document.getElementById('landscapeModal').style.display = 'none';
+    CyberSim.stop();
+}
+
+// 1. Sistem Login Saat Web Dibuka
+window.onload = function() {
+    if (!localStorage.getItem('currentUser')) {
+        let user = prompt("Username:");
+        let pass = prompt("Password:");
+        if (user && pass) {
+            let fd = new FormData();
+            fd.append('action', 'auth');
+            fd.append('username', user);
+            fd.append('password', pass);
+            fetch('server.php', { method: 'POST', body: fd })
+            .then(res => res.json()).then(data => {
+                if(data.status === 'success') {
+                    localStorage.setItem('currentUser', user);
+                    alert(data.message);
+                } else { alert(data.message); window.location.reload(); }
+            });
+        } else { window.location.reload(); }
+    }
+};
+
+// 2. Fungsi Buka Ranking
+function openRanking() {
+    document.getElementById('rankModal').style.display = 'block';
+    const rankBody = document.getElementById('rankBody');
+    rankBody.innerHTML = '<tr><td colspan="4" style="text-align:center">Loading...</td></tr>';
+
+    let fd = new FormData();
+    fd.append('action', 'get_rank');
+    fetch('server.php', { method: 'POST', body: fd })
+    .then(res => res.json()).then(data => {
+        rankBody.innerHTML = '';
+        data.data.forEach((p, i) => {
+            let medalColor = i === 0 ? '#ffd700' : (i === 1 ? '#c0c0c0' : (i === 2 ? '#cd7f32' : 'inherit'));
+            rankBody.innerHTML += `
+                <tr style="border-bottom: 1px solid var(--accent); height: 40px;">
+                    <td style="text-align:center; font-weight:bold; color:${medalColor}">${i+1}</td>
+                    <td><i class="fas fa-user-circle"></i> ${p.user}</td>
+                    <td style="text-align:right">${p.snake}</td>
+                    <td style="text-align:right; font-weight:bold">${p.total}</td>
+                </tr>`;
+        });
+    });
+}
+
+// 3. Fungsi Simpan Skor (Panggil ini saat game selesai)
+function updatePlayerScore(gameIndex, score) {
+    let user = localStorage.getItem('currentUser');
+    if(!user) return;
+    let fd = new FormData();
+    fd.append('action', 'update_score');
+    fd.append('username', user);
+    fd.append('game_index', gameIndex);
+    fd.append('score', score);
+    fetch('server.php', { method: 'POST', body: fd });
+}
+
+    </script>
+    <div id="stackModal" class="modal" style="display: none;">
+    <div class="modal-header">
+        <span>TOWER STACKER</span>
+        <span style="cursor:pointer" onclick="document.getElementById('stackModal').style.display='none'">[Exit]</span>
+    </div>
+    
+    <div class="stack-info">
+        SCORE: <span id="stackScore">0</span>
+    </div>
+
+    <canvas id="stackCanvas" width="300" height="400" onclick="handleStackClick()"></canvas>
+
+    <button id="stackBtn" onclick="initStack()">START GAME</button>
+</div>
+<div id="storyModal" class="modal">
+    <div class="modal-header">
+        <span>SESSION: UNKNOWN_ORIGIN</span>
+        <span style="cursor:pointer" onclick="tutupModal('storyModal')">X</span>
+    </div>
+    <div class="chat-container">
+        <div class="chat-messages" id="storyFlow"></div>
+        <div class="chat-input-area">
+            <input type="text" id="storyInput" class="chat-input" placeholder="Ketik jawaban..." autocomplete="off">
+        </div>
+    </div>
+</div>
+
+
+<div id="chessModal" class="modal" style="display:none;">
+    <div class="modal-header">
+        <span><i class="fas fa-chess-knight"></i> CHESS </span>
+        <span id="ch_timer">00:00</span>
+        <span onclick="closeChess()" style="cursor:pointer; padding:5px;">[Exit]</span>
+    </div>
+    
+    <div style="text-align:center; padding:10px 0;">
+        <div id="ch_status" style="margin-bottom:5px; font-weight:bold;">SELECT MODE</div>
+        <div id="ch_warning" style="color:#ff3d00; font-size:0.6rem; height:12px; margin-bottom:5px;"></div>
+        
+        <div id="ch_board"></div>
+
+        <div id="ch_modeSelect" style="margin-top:15px; display:flex; gap:10px;">
+            <button onclick="CyberChess.init('pvp')" class="reset-btn" style="flex:1;">2 PLAYER</button>
+            <button onclick="CyberChess.init('pve')" class="reset-btn" style="flex:1;">VS AI</button>
+        </div>
+        
+        <button id="ch_resetBtn" onclick="openChess()" class="reset-btn" style="margin-top:15px; width:100%; display:none;">REBOOT GAME</button>
+    </div>
+</div>
+<div id="landscapeModal" class="modal" style="display:none;">
+    <div class="modal-header">
+        <span><i class="fas fa-satellite-dish"></i> CYBER_LANDSCAPE v1.0</span>
+        <span onclick="closeLandscape()" style="cursor:pointer;">[X]</span>
+    </div>
+    
+    <div style="text-align:center; padding:10px 0;">
+        <canvas id="landscapeCanvas" width="280" height="180"></canvas> 
+        <div class="landscape-control">
+            <button onclick="startLandscape()"><i class="fas fa-play"></i> START</button>
+            <button onclick="stopLandscape()"><i class="fas fa-pause"></i> STOP</button>
+            <button onclick="resetLandscape()"><i class="fas fa-redo"></i> RESET</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
